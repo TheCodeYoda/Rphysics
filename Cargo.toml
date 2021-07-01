@@ -1,0 +1,12 @@
+[package]
+name = "rphysics"
+version = "0.1.0"
+authors = ["TheCodeYoda <smurf61988@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# piston = "0.53.0"
+piston_window = "0.93.0"
+rand = "0.6.5"
