@@ -1,5 +1,6 @@
 use piston_window::*;
 use rphysics::circle::*;
+use rphysics::collison::*;
 use rphysics::screen::*;
 
 fn get_circles() -> Vec<Circle> {
@@ -12,6 +13,21 @@ fn update(circ_list: &mut Vec<Circle>, dt: f64, screen: &Screen) {
     for circ in circ_list {
         circ.update_pos(dt);
         circ.check_bounds(screen.width(), screen.height());
+    }
+}
+
+fn check_collisions(circ_list: &mut Vec<Circle>) {
+    let n = circ_list.len();
+    for i in 0..n {
+        for j in i + 1..n {
+            if is_colliding(&circ_list[i], &circ_list[j]) {
+                let arr = collide(&circ_list[i], &circ_list[j]);
+                circ_list[i].vel_x = arr[0];
+                circ_list[i].vel_y = arr[1];
+                circ_list[j].vel_x = arr[2];
+                circ_list[j].vel_y = arr[3];
+            }
+        }
     }
 }
 // ellipse(x,y,halfwidth,halfheight)
@@ -42,6 +58,7 @@ fn main() {
             // update position according to speed after every unit of time in simulation
             // u->update object ;;;; u.dt ----> time elapsed in simulation
             update(&mut circ_list, u.dt, &screen);
+            check_collisions(&mut circ_list);
         }
     }
 }

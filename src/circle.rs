@@ -5,15 +5,20 @@ pub struct Circle {
     x: f64,
     y: f64,
     r: f64,
-    vel_x: f64,
-    vel_y: f64,
+    pub vel_x: f64,
+    pub vel_y: f64,
     color: [f32; 4],
 }
 
 impl Circle {
     pub fn new(x: f64, y: f64, r: f64, vel_x: f64, vel_y: f64) -> Circle {
         let mut rng = rand::thread_rng();
-        let color = [rng.gen_range(0.0, 1.0); 4];
+        let color = [
+            rng.gen_range(0.0, 1.0),
+            rng.gen_range(0.0, 1.0),
+            rng.gen_range(0.0, 1.0),
+            1.0,
+        ];
 
         return Circle {
             x: x,
