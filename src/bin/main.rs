@@ -3,8 +3,8 @@ use rphysics::circle::*;
 use rphysics::screen::*;
 
 fn get_circles() -> Vec<Circle> {
-    let circ_1 = Circle::new(50.0, 50.0, 50.0, 60.0, 0.0);
-    let circ_2 = Circle::new(462.0, 462.0, 50.0, -60.0, 0.0);
+    let circ_1 = Circle::new(50.0, 50.0, 50.0, 60.0, 60.0);
+    let circ_2 = Circle::new(462.0, 462.0, 50.0, -60.0, -60.0);
     return vec![circ_1, circ_2];
 }
 
@@ -14,11 +14,7 @@ fn update(circ_list: &mut Vec<Circle>, dt: f64, screen: &Screen) {
         circ.check_bounds(screen.width(), screen.height());
     }
 }
-
-///gets center of the circle
-// fn get_center(x: f64, y: f64) -> (f64, f64) {}
-
-// ellipse(x,y,halfwidth,halfheight)  x,y are points where the ellips touch x and y axes
+// ellipse(x,y,halfwidth,halfheight)
 
 fn main() {
     let screen = Screen::new(512.0, 512.0);
@@ -37,17 +33,7 @@ fn main() {
                 clear([0.5, 0.5, 0.5, 1.0], g);
                 for circ in &circ_list {
                     // let cir = ellipse::circle(circ.x(), circ.y(), circ.r());
-                    ellipse(
-                        [1.0, 0.0, 0.0, 1.0], // red color
-                        [
-                            circ.x() - circ.r(),
-                            circ.y() - circ.r(),
-                            2.0 * circ.r(),
-                            2.0 * circ.r(),
-                        ],
-                        c.transform,
-                        g,
-                    );
+                    ellipse(circ.color(), circ.readjust(), c.transform, g);
                 }
             });
         }
