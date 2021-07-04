@@ -2,10 +2,20 @@ use piston_window::*;
 use rphysics::circle::*;
 use rphysics::collison::*;
 use rphysics::screen::*;
+use std::f64::consts::PI;
 
 fn get_circles() -> Vec<Circle> {
-    let circ_1 = Circle::new(50.0, 50.0, 50.0, 60.0, 60.0);
-    let circ_2 = Circle::new(462.0, 462.0, 50.0, -60.0, -60.0);
+    // let w = 512.0;
+    // let h = 512.0;
+    // let v = 60.0;
+    // let circ_1 = Circle::new(256.0, 0.0, 50.0, 0.0, 60.0);
+    // let x = w/2.0 -((w/2.0)*(PI/3.0).sin());
+    // let y = ((w/2.0*(PI/3.0).cos())) + h/2.0;
+    // let circ_2 = Circle::new(x, y, 50.0,v*(PI/6.0).cos(), -v*(PI/6.0).sin());
+    // let x = w/2.0 +((w/2.0)*(PI/3.0).sin());
+    // let circ_3 = Circle::new(x, y, 50.0, -v*(PI/6.0).cos(), -v*(PI/6.0).sin());
+    let circ_1 = Circle::new(256.0-25.0,50.0,50.0,0.0,60.0);
+    let circ_2 = Circle::new(256.0+25.0,462.0,50.0,0.0,-60.0);
     return vec![circ_1, circ_2];
 }
 
@@ -18,14 +28,16 @@ fn update(circ_list: &mut Vec<Circle>, dt: f64, screen: &Screen) {
 
 fn check_collisions(circ_list: &mut Vec<Circle>) {
     let n = circ_list.len();
+    // let mut res = Vec::new();
     for i in 0..n {
         for j in i + 1..n {
             if is_colliding(&circ_list[i], &circ_list[j]) {
+                // let (a, b) = circ_list.split_at_mut(i); // Returns (&mut [1], &mut [2, 3])
                 let arr = collide(&circ_list[i], &circ_list[j]);
-                circ_list[i].vel_x = arr[0];
-                circ_list[i].vel_y = arr[1];
-                circ_list[j].vel_x = arr[2];
-                circ_list[j].vel_y = arr[3];
+                circ_list[i].v[0] = arr.0.0;
+                circ_list[i].v[1] = arr.0.1;
+                circ_list[j].v[0] = arr.1.0;
+                circ_list[j].v[1] = arr.1.1;
             }
         }
     }

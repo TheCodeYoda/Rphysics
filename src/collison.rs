@@ -1,4 +1,3 @@
-///unit struct
 use crate::circle::Circle;
 
 fn distance(x1: f64, y1: f64, x2: f64, y2: f64) -> f64 {
@@ -15,7 +14,10 @@ pub fn is_colliding(circ1: &Circle, circ2: &Circle) -> bool {
 }
 
 ///elastic collisons conserve momentum and energies, readjust velocities cosidering unit masses
-pub fn collide(circ1: &Circle, circ2: &Circle) -> [f64; 4] {
+pub fn collide(circ1: &Circle, circ2: &Circle) -> ((f64, f64), (f64, f64)) {
     // just exchange of velocities happen (in both directions)
-    return [circ2.vel_x, circ2.vel_y, circ1.vel_x, circ1.vel_y];
+    return (
+        (circ2.vel_x(), circ2.vel_y()),
+        (circ1.vel_x(), circ1.vel_y()),
+    );
 }
