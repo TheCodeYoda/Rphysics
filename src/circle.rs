@@ -5,7 +5,7 @@ use glm::*;
 use rand::*;
 
 pub struct Circle {
-    point: DVec2,
+    pub point: DVec2,
     r: f64,
     pub v: DVec2,
     pub mass: f64,
