@@ -1,4 +1,5 @@
-use crate::screen::Check;
+use crate::gravity::*;
+use crate::screen::*;
 
 extern crate nalgebra_glm as glm;
 use glm::*;
@@ -56,8 +57,12 @@ impl Circle {
     }
 
     /// update coords given time
-    pub fn update_pos(&mut self, dt: f64) {
+    pub fn update_pos(&mut self, dt: f64, grav: &Gravity, screen: &Screen) {
         self.point[0] += self.v[0] * dt;
+        // v = u+at;
+        if self.point[1] + self.r < screen.height() {
+            self.v[1] = self.v[1] + grav.g() * dt;
+        }
         self.point[1] += self.v[1] * dt;
     }
 
@@ -80,21 +85,22 @@ impl Circle {
 impl Check for Circle {
     /// consider collison with the wall
     fn check_bounds(&mut self, width: f64, height: f64) {
+        let e = 0.83;
         // hits right side wall
         if self.point[0] + self.r > width && self.v[0] > 0.0 {
-            self.v[0] = -self.v[0];
+            self.v[0] = -e * self.v[0];
         }
         // hits lower wall
         if self.point[1] + self.r > height && self.v[1] > 0.0 {
-            self.v[1] = -self.v[1];
+            self.v[1] = -e * self.v[1];
         }
         // hits left side wall
         if self.point[0] - self.r < 0.0 && self.v[0] < 0.0 {
-            self.v[0] = -self.v[0];
+            self.v[0] = -e * self.v[0];
         }
         // hits upper wall
         if self.point[1] - self.r < 0.0 && self.v[1] < 0.0 {
-            self.v[1] = -self.v[1];
+            self.v[1] = -e * self.v[1];
         }
     }
 }
