@@ -7,16 +7,23 @@ use rphysics::collison::*;
 use rphysics::screen::*;
 
 
-fn get_circle(list:&Vec<Circle>) -> Option<Circle> {
+fn get_circle(list:&Vec<Circle>,screen:&Screen) -> Option<Circle> {
     let mut tries = 100000;
     while tries>0 {
+        // rand handle
         let mut rng = rand::thread_rng();
+        
         let min_vel = 600.0;
         let max_vel = 700.0;
-          let circ = Circle::new(rng.gen_range(50.0,462.0),rng.gen_range(50.0,462.0),rng.gen_range(25.0,60.0),rng.gen_range(min_vel,max_vel),rng.gen_range(min_vel,max_vel));
+        let min_radius = 25.0;
+        let max_radius = 30.0;
+        let width = screen.width();
+        let height = screen.height(); 
+        
+          let circ = Circle::new(rng.gen_range(0.0,width),rng.gen_range(0.0,height),rng.gen_range(min_radius,max_radius),rng.gen_range(min_vel,max_vel),rng.gen_range(min_vel,max_vel));
           let mut flag = 1;
           for sample in list {
-              if is_colliding(&circ,&sample) {
+              if let Some(_) = is_colliding(&circ,&sample) {
                   flag = 0;
                   break;
               }
@@ -29,7 +36,7 @@ fn get_circle(list:&Vec<Circle>) -> Option<Circle> {
     return None;
 }
 
-fn get_circles() -> Vec<Circle> {
+fn get_circles(screen: &Screen) -> Vec<Circle> {
     // let w = 512.0;
     // let h = 512.0;
     // let v = 100.0;
@@ -44,9 +51,9 @@ fn get_circles() -> Vec<Circle> {
     // let circ_2 = Circle::new(256.0+25.0,462.0,50.0,0.0,-60.0);
     // return vec![circ_1, circ_2];
     let mut list:Vec<Circle> = Vec::new();
-    let n = 5;
+    let n = 50;
     for _i in 0..n {
-        if let Some(circ) = get_circle(&list) {
+        if let Some(circ) = get_circle(&list,&screen) {
             list.push(circ);
         }
     }
@@ -65,7 +72,10 @@ fn check_collisions(circ_list: &mut Vec<Circle>) {
     // let mut res = Vec::new();
     for i in 0..n {
         for j in i + 1..n {
-            if is_colliding(&circ_list[i], &circ_list[j]) {
+            if let Some(p) = is_colliding(&circ_list[i], &circ_list[j]) {
+                // static collison readjusting
+                circ_list[i].point = p.0;
+                circ_list[j].point = p.1;
                 // let (a, b) = circ_list.split_at_mut(i); // Returns (&mut [1], &mut [2, 3])
                 let arr = collide(&circ_list[i], &circ_list[j]);
                 circ_list[i].v[0] = arr.0.0;
@@ -79,13 +89,13 @@ fn check_collisions(circ_list: &mut Vec<Circle>) {
 // ellipse(x,y,halfwidth,halfheight)
 
 fn main() {
-    let screen = Screen::new(512.0, 512.0);
+    let screen = Screen::new(512.0,512.0);
 
     // initializing piston window
-    let mut window: PistonWindow = WindowSettings::new("Circles!", [512; 2]).build().unwrap();
+    let mut window: PistonWindow = WindowSettings::new("Circles!", [screen.width(),screen.height()]).build().unwrap();
 
     // list of circles to render
-    let mut circ_list = get_circles();
+    let mut circ_list = get_circles(&screen);
 
     // render loop
     while let Some(e) = window.next() {
