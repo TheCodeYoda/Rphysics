@@ -24,6 +24,7 @@ pub fn is_colliding(circ1: &Circle, circ2: &Circle) -> Option<(DVec2, DVec2)> {
 
 /// elastic collisons conserve momentum and energies, readjust velocities
 pub fn collide(circ1: &Circle, circ2: &Circle) -> ((f64, f64), (f64, f64)) {
+    let e = 0.7;
     //Conserve energy and momentum look at wikipedia for elastic collisons
     let total_mass = circ1.mass + circ2.mass;
     let mass_ratio_1 = (2.0 * circ2.mass) / total_mass;
@@ -35,10 +36,10 @@ pub fn collide(circ1: &Circle, circ2: &Circle) -> ((f64, f64), (f64, f64)) {
     let x2 = circ2.point;
 
     let dot_1 = dot(&(v1 - v2), &(x1 - x2));
-    let v1_new = circ1.v - (mass_ratio_1 * (dot_1 / length2(&(x1 - x2))) * (x1 - x2));
+    let v1_new = e * (circ1.v - (mass_ratio_1 * (dot_1 / length2(&(x1 - x2))) * (x1 - x2)));
 
     let dot_2 = dot(&(v2 - v1), &(x2 - x1));
-    let v2_new = circ2.v - (mass_ratio_2 * (dot_2 / length2(&(x2 - x1))) * (x2 - x1));
+    let v2_new = e * (circ2.v - (mass_ratio_2 * (dot_2 / length2(&(x2 - x1))) * (x2 - x1)));
 
     return ((v1_new[0], v1_new[1]), (v2_new[0], v2_new[1]));
 }
