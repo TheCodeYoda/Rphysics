@@ -7,12 +7,19 @@ fn distance(x1: f64, y1: f64, x2: f64, y2: f64) -> f64 {
     return sq.sqrt();
 }
 
-pub fn is_colliding(circ1: &Circle, circ2: &Circle) -> bool {
+pub fn is_colliding(circ1: &Circle, circ2: &Circle) -> Option<(DVec2, DVec2)> {
     let dist = distance(circ1.x(), circ1.y(), circ2.x(), circ2.y());
-    if (dist - (circ1.r() + circ2.r())) < 0.7 {
-        return true;
+    if dist <= circ1.r() + circ2.r() {
+        let overlap = 0.5 * (dist - circ1.r() - circ2.r());
+
+        // resolve static collison by displacing them away iif they are overlapping
+        // move circ1,circ2 away by 0.5 of overlap in unit vector direction
+        let point1 = circ1.point - overlap * ((circ1.point - circ2.point) / dist);
+        let point2 = circ2.point + overlap * ((circ1.point - circ2.point) / dist);
+
+        return Some((point1, point2));
     }
-    return false;
+    return None;
 }
 
 /// elastic collisons conserve momentum and energies, readjust velocities
