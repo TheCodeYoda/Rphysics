@@ -19,8 +19,3 @@ impl Screen {
         return self.width;
     }
 }
-
-// a trait for checking bounds of screen and readjusting the position of the shape accordingly
-pub trait Check {
-    fn check_bounds(&mut self, width: f64, height: f64);
-}

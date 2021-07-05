@@ -1,5 +1,6 @@
-use crate::gravity::*;
-use crate::screen::*;
+use crate::collison::{distance, Collision};
+use crate::gravity::Gravity;
+use crate::screen::Screen;
 
 extern crate nalgebra_glm as glm;
 use glm::*;
@@ -82,10 +83,12 @@ impl Circle {
     }
 }
 
-impl Check for Circle {
+impl Collision for Circle {
     /// consider collison with the wall
-    fn check_bounds(&mut self, width: f64, height: f64) {
-        let e = 0.83;
+    fn check_bounds(&mut self, screen: &Screen, e: f64) {
+        let width = screen.width();
+        let height = screen.height();
+
         // hits right side wall
         if self.point[0] + self.r > width && self.v[0] > 0.0 {
             self.v[0] = -e * self.v[0];
@@ -102,5 +105,40 @@ impl Check for Circle {
         if self.point[1] - self.r < 0.0 && self.v[1] < 0.0 {
             self.v[1] = -e * self.v[1];
         }
+    }
+
+    fn is_colliding(&self, other: &Circle) -> Option<(DVec2, DVec2)> {
+        let dist = distance(self.x(), self.y(), other.x(), other.y());
+        if dist <= self.r() + other.r() {
+            let overlap = 0.5 * (dist - self.r() - other.r());
+
+            // resolve static collison by displacing them away iif they are overlapping
+            // move self,other away by 0.5 of overlap in unit vector direction
+            let self_point = self.point - overlap * ((self.point - other.point) / dist);
+            let other_point = other.point + overlap * ((self.point - other.point) / dist);
+
+            return Some((self_point, other_point));
+        }
+        return None;
+    }
+
+    fn collide(&self, other: &Circle, e: f64) -> (DVec2, DVec2) {
+        //Conserve energy and momentum look at wikipedia for elastic collisons
+        let total_mass = self.mass + other.mass;
+        let mass_ratio_1 = (2.0 * other.mass) / total_mass;
+        let mass_ratio_2 = (2.0 * self.mass) / total_mass;
+
+        let v1 = self.v;
+        let v2 = other.v;
+        let x1 = self.point;
+        let x2 = other.point;
+
+        let dot_1 = dot(&(v1 - v2), &(x1 - x2));
+        let self_v = e * (self.v - (mass_ratio_1 * (dot_1 / length2(&(x1 - x2))) * (x1 - x2)));
+
+        let dot_2 = dot(&(v2 - v1), &(x2 - x1));
+        let other_v = e * (other.v - (mass_ratio_2 * (dot_2 / length2(&(x2 - x1))) * (x2 - x1)));
+
+        return (self_v, other_v);
     }
 }
