@@ -1,5 +1,5 @@
 use piston_window::*;
-//use std::f64::consts::PI;
+// use std::f64::consts::PI;
 use rand::*;
 
 use rphysics::circle::*;
@@ -11,8 +11,8 @@ fn get_circle(list:&Vec<Circle>) -> Option<Circle> {
     let mut tries = 100000;
     while tries>0 {
         let mut rng = rand::thread_rng();
-        let min_vel = 100.0;
-        let max_vel = 150.0;
+        let min_vel = 600.0;
+        let max_vel = 700.0;
           let circ = Circle::new(rng.gen_range(50.0,462.0),rng.gen_range(50.0,462.0),rng.gen_range(25.0,60.0),rng.gen_range(min_vel,max_vel),rng.gen_range(min_vel,max_vel));
           let mut flag = 1;
           for sample in list {
@@ -32,8 +32,8 @@ fn get_circle(list:&Vec<Circle>) -> Option<Circle> {
 fn get_circles() -> Vec<Circle> {
     // let w = 512.0;
     // let h = 512.0;
-    // let v = 60.0;
-    // let circ_1 = Circle::new(256.0, 0.0, 50.0, 0.0, 60.0);
+    // let v = 100.0;
+    // let circ_1 = Circle::new(256.0, 0.0, 50.0, 0.0, v);
     // let x = w/2.0 -((w/2.0)*(PI/3.0).sin());
     // let y = ((w/2.0*(PI/3.0).cos())) + h/2.0;
     // let circ_2 = Circle::new(x, y, 50.0,v*(PI/6.0).cos(), -v*(PI/6.0).sin());
