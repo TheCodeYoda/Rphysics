@@ -10,8 +10,10 @@ use rphysics::screen::*;
 fn get_circle(list:&Vec<Circle>) -> Option<Circle> {
     let mut tries = 100000;
     while tries>0 {
-          let mut rng = rand::thread_rng();
-          let circ = Circle::new(rng.gen_range(50.0,462.0),rng.gen_range(50.0,462.0),rng.gen_range(25.0,60.0),rng.gen_range(-70.0,70.0),rng.gen_range(-70.0,70.0));
+        let mut rng = rand::thread_rng();
+        let min_vel = 100.0;
+        let max_vel = 150.0;
+          let circ = Circle::new(rng.gen_range(50.0,462.0),rng.gen_range(50.0,462.0),rng.gen_range(25.0,60.0),rng.gen_range(min_vel,max_vel),rng.gen_range(min_vel,max_vel));
           let mut flag = 1;
           for sample in list {
               if is_colliding(&circ,&sample) {
@@ -42,7 +44,7 @@ fn get_circles() -> Vec<Circle> {
     // let circ_2 = Circle::new(256.0+25.0,462.0,50.0,0.0,-60.0);
     // return vec![circ_1, circ_2];
     let mut list:Vec<Circle> = Vec::new();
-    let n = 7;
+    let n = 5;
     for _i in 0..n {
         if let Some(circ) = get_circle(&list) {
             list.push(circ);

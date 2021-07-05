@@ -77,22 +77,23 @@ impl Circle {
 }
 
 impl Check for Circle {
+    /// consider collison with the wall
     fn check_bounds(&mut self, width: f64, height: f64) {
+        // hits side wall
         if self.point[0] + self.r > width {
-            self.point[0] = width - self.r;
-            self.v[0] = 0.0;
+            self.v[0] = -self.v[0];
         }
+        // hits upper wall
         if self.point[1] + self.r > height {
-            self.point[1] = height - self.r;
-            self.v[1] = 0.0;
+            self.v[1] = -self.v[1];
         }
+        // hits side wall
         if self.point[0] - self.r < 0.0 {
-            self.point[0] = self.r;
-            self.v[0] = 0.0;
+            self.v[0] = -self.v[0];
         }
+        // hits upper wall
         if self.point[1] - self.r < 0.0 {
-            self.point[1] = self.r;
-            self.v[1] = 0.0;
+            self.v[1] = -self.v[1];
         }
     }
 }
