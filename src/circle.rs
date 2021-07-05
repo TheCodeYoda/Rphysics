@@ -3,6 +3,7 @@ use crate::screen::Check;
 extern crate nalgebra_glm as glm;
 use glm::*;
 use rand::*;
+use std::f64::consts::PI;
 
 pub struct Circle {
     pub point: DVec2,
@@ -26,7 +27,7 @@ impl Circle {
             point: vec2(x, y),
             r: r,
             v: vec2(vel_x, vel_y),
-            mass: r * 10.0,
+            mass: PI * r * r,
             color: color,
         };
     }
@@ -79,20 +80,20 @@ impl Circle {
 impl Check for Circle {
     /// consider collison with the wall
     fn check_bounds(&mut self, width: f64, height: f64) {
-        // hits side wall
-        if self.point[0] + self.r > width {
+        // hits right side wall
+        if self.point[0] + self.r > width && self.v[0] > 0.0 {
             self.v[0] = -self.v[0];
         }
-        // hits upper wall
-        if self.point[1] + self.r > height {
+        // hits lower wall
+        if self.point[1] + self.r > height && self.v[1] > 0.0 {
             self.v[1] = -self.v[1];
         }
-        // hits side wall
-        if self.point[0] - self.r < 0.0 {
+        // hits left side wall
+        if self.point[0] - self.r < 0.0 && self.v[0] < 0.0 {
             self.v[0] = -self.v[0];
         }
         // hits upper wall
-        if self.point[1] - self.r < 0.0 {
+        if self.point[1] - self.r < 0.0 && self.v[1] < 0.0 {
             self.v[1] = -self.v[1];
         }
     }
