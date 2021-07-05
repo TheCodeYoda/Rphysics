@@ -5,6 +5,7 @@ use rand::*;
 use rphysics::circle::*;
 use rphysics::collison::*;
 use rphysics::screen::*;
+use rphysics::gravity::*;
 
 
 fn get_circle(list:&Vec<Circle>,screen:&Screen) -> Option<Circle> {
@@ -47,11 +48,15 @@ fn get_circles(screen: &Screen) -> Vec<Circle> {
     // let x = w/2.0 +((w/2.0)*(PI/3.0).sin());
     // let circ_3 = Circle::new(x, y, 50.0, -v*(PI/6.0).cos(), -v*(PI/6.0).sin());
     // return vec![circ_1, circ_2,circ_3];
-    // let circ_1 = Circle::new(256.0-25.0,50.0,50.0,0.0,60.0);
+
+    // ------------------custom testing ----------------------------
+    // let circ_1 = Circle::new(50.0,50.0,50.0,60.0,0.0);
     // let circ_2 = Circle::new(256.0+25.0,462.0,50.0,0.0,-60.0);
-    // return vec![circ_1, circ_2];
+    // return vec![circ_1];
+
+    // --------------------------random testing -------------------------------------
     let mut list:Vec<Circle> = Vec::new();
-    let n = 50;
+    let n = 7;
     for _i in 0..n {
         if let Some(circ) = get_circle(&list,&screen) {
             list.push(circ);
@@ -62,7 +67,7 @@ fn get_circles(screen: &Screen) -> Vec<Circle> {
 
 fn update(circ_list: &mut Vec<Circle>, dt: f64, screen: &Screen) {
     for circ in circ_list {
-        circ.update_pos(dt);
+        circ.update_pos(dt,&Gravity::new(),&screen);
         circ.check_bounds(screen.width(), screen.height());
     }
 }
@@ -73,10 +78,10 @@ fn check_collisions(circ_list: &mut Vec<Circle>) {
     for i in 0..n {
         for j in i + 1..n {
             if let Some(p) = is_colliding(&circ_list[i], &circ_list[j]) {
-                // static collison readjusting
+                // static collison readjusting (ensures no circle is overlapping with any circle)
                 circ_list[i].point = p.0;
                 circ_list[j].point = p.1;
-                // let (a, b) = circ_list.split_at_mut(i); // Returns (&mut [1], &mut [2, 3])
+                // dynamic collison
                 let arr = collide(&circ_list[i], &circ_list[j]);
                 circ_list[i].v[0] = arr.0.0;
                 circ_list[i].v[1] = arr.0.1;
@@ -102,6 +107,7 @@ fn main() {
         // this is for rendering
         if let Some(_) = e.render_args() {
             window.draw_2d(&e, |c, g, _| {
+                // background color
                 clear([0.5, 0.5, 0.5, 1.0], g);
                 for circ in &circ_list {
                     // let cir = ellipse::circle(circ.x(), circ.y(), circ.r());
