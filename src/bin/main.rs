@@ -1,6 +1,7 @@
 use piston_window::*;
 // use std::f64::consts::PI;
 use rand::*;
+use std::env;
 
 use rphysics::circle::*;
 use rphysics::collison::*;
@@ -43,7 +44,7 @@ fn get_circle(list: &Vec<Circle>, screen: &Screen) -> Option<Circle> {
     return None;
 }
 
-fn get_circles(screen: &Screen) -> Vec<Circle> {
+fn get_circles(screen: &Screen, n: u32) -> Vec<Circle> {
     // let w = 512.0;
     // let h = 512.0;
     // let v = 100.0;
@@ -62,7 +63,6 @@ fn get_circles(screen: &Screen) -> Vec<Circle> {
 
     // --------------------------random testing -------------------------------------
     let mut list: Vec<Circle> = Vec::new();
-    let n = 20;
     for _i in 0..n {
         if let Some(circ) = get_circle(&list, &screen) {
             list.push(circ);
@@ -71,19 +71,15 @@ fn get_circles(screen: &Screen) -> Vec<Circle> {
     return list;
 }
 
-fn update(circ_list: &mut Vec<Circle>, dt: f64, screen: &Screen) {
-    let mut grav = Gravity::new();
-    let e = 1.0;
-    grav.off();
+fn update(circ_list: &mut Vec<Circle>, dt: f64, screen: &Screen, grav: &Gravity, e: f64) {
     for circ in circ_list {
-        circ.update_pos(dt, &Gravity::new(), &screen);
+        circ.update_pos(dt, &grav, &screen);
         circ.check_bounds(screen, e);
     }
 }
 
-fn check_collisions(circ_list: &mut Vec<Circle>) {
+fn check_collisions(circ_list: &mut Vec<Circle>, e: f64) {
     let n = circ_list.len();
-    let e = 1.0;
     // let mut res = Vec::new();
     for i in 0..n {
         for j in i + 1..n {
@@ -102,6 +98,19 @@ fn check_collisions(circ_list: &mut Vec<Circle>) {
 // ellipse(x,y,halfwidth,halfheight)
 
 fn main() {
+    // commandline args
+    // [gravity] [no.of.circles] [e]
+    let args: Vec<String> = env::args().collect();
+    // println!("{:?}", (args));
+    // gravity state
+    let grav_state = &args[1];
+    // no.of circles
+    let n: u32 = args[2].parse().unwrap();
+    // coeffecient of restitution
+    let e: f64 = args[3].parse().unwrap();
+
+    println!("{:?}", (grav_state, n, e));
+
     let screen = Screen::new(512.0, 512.0);
 
     // initializing piston window
@@ -111,13 +120,19 @@ fn main() {
             .unwrap();
 
     // list of circles to render
-    let mut circ_list = get_circles(&screen);
+    let mut circ_list = get_circles(&screen, n);
+
+    // gravity object
+    let mut grav = Gravity::new();
+    if grav_state == "off" {
+        grav.off();
+    }
 
     // render loop
-    while let Some(e) = window.next() {
+    while let Some(event) = window.next() {
         // this is for rendering
-        if let Some(_) = e.render_args() {
-            window.draw_2d(&e, |c, g, _| {
+        if let Some(_) = event.render_args() {
+            window.draw_2d(&event, |c, g, _| {
                 // background color
                 clear([0.5, 0.5, 0.5, 1.0], g);
                 for circ in &circ_list {
@@ -127,11 +142,11 @@ fn main() {
             });
         }
         // this is for updation of movement of shapes
-        if let Some(u) = e.update_args() {
+        if let Some(u) = event.update_args() {
             // update position according to speed after every unit of time in simulation
             // u->update object ;;;; u.dt ----> time elapsed in simulation
-            update(&mut circ_list, u.dt, &screen);
-            check_collisions(&mut circ_list);
+            update(&mut circ_list, u.dt, &screen, &grav, e);
+            check_collisions(&mut circ_list, e);
         }
     }
 }

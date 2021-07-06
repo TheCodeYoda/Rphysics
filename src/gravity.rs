@@ -4,7 +4,7 @@ pub struct Gravity {
 
 impl Gravity {
     pub fn new() -> Gravity {
-        return Gravity { g: 0.0 };
+        return Gravity { g: 30.0 };
     }
 
     pub fn g(&self) -> f64 {
