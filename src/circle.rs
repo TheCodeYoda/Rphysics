@@ -10,6 +10,7 @@ pub struct Circle {
     pub point: DVec2,
     r: f64,
     pub v: DVec2,
+    pub force: DVec2,
     pub mass: f64,
     color: [f32; 4],
 }
@@ -28,6 +29,7 @@ impl Circle {
             point: vec2(x, y),
             r: r,
             v: vec2(vel_x, vel_y),
+            force: vec2(0.0, 0.0),
             mass: PI * r * r,
             color: color,
         };
@@ -80,30 +82,46 @@ impl Circle {
             (self.r) * 2.0,
         ];
     }
+
+    /// adds force
+    pub fn add_force(&mut self, force: DVec2) {
+        self.force += force;
+    }
 }
 
 impl Collision for Circle {
     /// consider collison with the wall
-    fn check_bounds(&mut self, screen: &Screen, e: f64) {
+    fn check_bounds(&mut self, screen: &Screen, e: f64) -> DVec2 {
         let width = screen.width();
         let height = screen.height();
-
         // hits right side wall
-        if self.point[0] + self.r > width && self.v[0] > 0.0 {
+        if self.point[0] + self.r > width && self.v[0] >= 0.0 {
             self.v[0] = -e * self.v[0];
+            self.point[0] = width - self.r;
+            return vec2(-self.force[0], self.force[1]);
         }
         // hits lower wall
-        if self.point[1] + self.r > height && self.v[1] > 0.0 {
+        if self.point[1] + self.r > height && self.v[1] >= 0.0 {
             self.v[1] = -e * self.v[1];
+            self.point[1] = height - self.r;
+            return vec2(self.force[0], -self.force[1]);
+            // let net_force = self.mass * self.a;
+            // let normal_reaction = -net_force;
+            // self.a = (net_force + normal_reaction) / self.mass;
         }
         // hits left side wall
-        if self.point[0] - self.r < 0.0 && self.v[0] < 0.0 {
+        if self.point[0] - self.r < 0.0 && self.v[0] <= 0.0 {
             self.v[0] = -e * self.v[0];
+            self.point[0] = self.r;
+            return vec2(-self.force[0], self.force[1]);
         }
         // hits upper wall
-        if self.point[1] - self.r < 0.0 && self.v[1] < 0.0 {
+        if self.point[1] - self.r < 0.0 && self.v[1] <= 0.0 {
             self.v[1] = -e * self.v[1];
+            self.point[1] = self.r;
+            return vec2(self.force[0], -self.force[1]);
         }
+        return vec2(0.0, 0.0);
     }
 
     fn is_colliding(&self, other: &Circle) -> Option<(DVec2, DVec2)> {

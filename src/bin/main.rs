@@ -71,7 +71,6 @@ fn get_circles(engine: &mut Engine, n: u32) {
 
 fn update(engine: &mut Engine, dt: f64) {
     engine.update_pos(dt);
-    engine.check_border();
     engine.resolve_collisons();
 }
 
@@ -119,13 +118,15 @@ fn main() {
     // list of circles to render
     // let mut circ_list = get_circles(&screen, n);
 
-    // gravity object
+    // engine object
     let mut eng = Engine::new(e, screen);
-    if grav_state == "off" {
-        eng.gravity_off();
-    }
 
+    // get object list
     get_circles(&mut eng, n);
+
+    if grav_state == "on" {
+        eng.gravity_on();
+    }
 
     // render loop
     while let Some(event) = window.next() {

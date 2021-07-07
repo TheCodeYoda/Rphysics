@@ -2,8 +2,11 @@ use crate::circle::Circle;
 use crate::collison::*;
 use crate::screen::Screen;
 
+extern crate nalgebra_glm as glm;
+use glm::*;
+
 pub struct Engine {
-    g: f64,
+    g: DVec2,
     e: f64,
     pub object_list: Vec<Circle>,
     pub screen: Screen,
@@ -12,14 +15,14 @@ pub struct Engine {
 impl Engine {
     pub fn new(e: f64, screen: Screen) -> Engine {
         return Engine {
-            g: 30.0,
+            g: vec2(0.0, 0.0),
             e: e,
             object_list: Vec::new(),
             screen: screen,
         };
     }
 
-    pub fn g(&self) -> f64 {
+    pub fn g(&self) -> DVec2 {
         return self.g;
     }
 
@@ -28,11 +31,26 @@ impl Engine {
     }
 
     pub fn gravity_on(&mut self) {
-        self.g = 30.0;
+        self.g = vec2(0.0, 30.0);
+        for circ in self.object_list.iter_mut() {
+            circ.force += circ.mass * self.g;
+        }
+    }
+
+    pub fn add_gravity_force(&mut self) {
+        for circ in self.object_list.iter_mut() {
+            circ.force += circ.mass * self.g;
+        }
+    }
+
+    pub fn remove_gravity_force(&mut self) {
+        for circ in self.object_list.iter_mut() {
+            circ.force -= circ.mass * self.g;
+        }
     }
 
     pub fn gravity_off(&mut self) {
-        self.g = 0.0;
+        self.g = vec2(0.0, 0.0)
     }
 
     pub fn add(&mut self, circ: Circle) {
@@ -41,12 +59,18 @@ impl Engine {
 
     pub fn update_pos(&mut self, dt: f64) {
         for circ in &mut self.object_list {
-            circ.point[0] += circ.v[0] * dt;
-            // v = u+at;
-            if circ.point[1] + circ.r() < self.screen.height() {
-                circ.v[1] = circ.v[1] + self.g * dt;
-            }
-            circ.point[1] += circ.v[1] * dt;
+            // circ.point[0] += circ.v[0] * dt;
+            // // v = u+at;
+            // if circ.point[1] + circ.r() < self.screen.height() {
+            //     circ.v[1] = circ.v[1] + self.g * dt;
+            // }
+            // circ.point[1] += circ.v[1] * dt;
+            // println!("{:?}", (circ.point));
+            let normal_reaction = circ.check_bounds(&self.screen, self.e);
+            let net_force = circ.force + normal_reaction;
+            let acc = net_force / circ.mass;
+            circ.v = circ.v + (acc * dt);
+            circ.point = circ.point + (circ.v * dt);
         }
     }
 
