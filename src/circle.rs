@@ -1,5 +1,4 @@
 use crate::collison::{distance, Collision};
-use crate::gravity::Gravity;
 use crate::screen::Screen;
 
 extern crate nalgebra_glm as glm;
@@ -58,14 +57,14 @@ impl Circle {
     }
 
     /// update coords given time
-    pub fn update_pos(&mut self, dt: f64, grav: &Gravity, screen: &Screen) {
-        self.point[0] += self.v[0] * dt;
-        // v = u+at;
-        if self.point[1] + self.r < screen.height() {
-            self.v[1] = self.v[1] + grav.g() * dt;
-        }
-        self.point[1] += self.v[1] * dt;
-    }
+    // pub fn update_pos(&mut self, dt: f64, grav: &Gravity, screen: &Screen) {
+    //     self.point[0] += self.v[0] * dt;
+    //     // v = u+at;
+    //     if self.point[1] + self.r < screen.height() {
+    //         self.v[1] = self.v[1] + grav.g() * dt;
+    //     }
+    //     self.point[1] += self.v[1] * dt;
+    // }
 
     /// helper to display coords
     pub fn disp_coords(&self) {
