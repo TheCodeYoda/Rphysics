@@ -5,8 +5,11 @@ use crate::screen::Screen;
 extern crate nalgebra_glm as glm;
 use glm::*;
 
-fn intersects(a: &DVec2, b: &DVec2) -> bool {
-    if f64::min(b[0], b[1]) < f64::max(a[0], a[1]) {
+fn intersects(a: &DVec3, b: &DVec3) -> bool {
+    let aabb1 = [a[0] - a[2], a[0] + a[2]];
+    let aabb2 = [b[0] - b[2], b[0] + b[2]];
+
+    if f64::min(aabb2[0], aabb2[1]) < f64::max(aabb1[0], aabb1[1]) {
         return true;
     }
     return false;
@@ -109,26 +112,41 @@ impl Engine {
     // implementing sweep and prune algo
     pub fn resolve_collisons(&mut self) {
         let n = self.object_list.len();
-        // let mut res = Vec::new();
+        // sort according to x axis
         self.object_list
-            .sort_by(|a, b| a.y().partial_cmp(&b.y()).unwrap());
+            .sort_by(|a, b| a.x().partial_cmp(&b.x()).unwrap());
 
+        // active list contains circles which are overlapping in specified axis
         let mut active_list: Vec<usize> = Vec::new();
         active_list.push(0);
 
-        for i in 1..n {
+        let mut i = 1;
+
+        while i < n {
             if !active_list.is_empty() {
                 let ind: usize = *active_list.last().unwrap();
-                if intersects(&self.object_list[i].point, &self.object_list[ind].point) {
+                let ob1 = vec3(
+                    self.object_list[i].x(),
+                    self.object_list[i].y(),
+                    self.object_list[i].r(),
+                );
+                let ob2 = vec3(
+                    self.object_list[ind].x(),
+                    self.object_list[ind].y(),
+                    self.object_list[ind].r(),
+                );
+                if intersects(&ob1, &ob2) {
                     active_list.push(i);
+                    i += 1;
                     self.resolve_active_collisons(&active_list, self.e);
                 } else {
-                    while !active_list.is_empty() {
+                    if !active_list.is_empty() {
                         active_list.pop();
                     }
                 }
             } else {
                 active_list.push(i);
+                i += 1;
             }
         }
 
