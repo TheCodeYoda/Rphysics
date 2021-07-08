@@ -59,7 +59,7 @@ fn get_circles(engine: &mut Engine, n: u32) {
     // ------------------custom testing ----------------------------
     // let circ_1 = Circle::new(50.0, 50.0, 50.0, 0.0, 0.0);
     // let circ_2 = Circle::new(50.0, 462.0, 50.0, 0.0, 0.0);
-    // engine.object_list = vec![circ_1, circ_2];
+    // engine.object_list = vec![circ_2];
 
     // --------------------------random testing -------------------------------------
     for _i in 0..n {
@@ -73,25 +73,6 @@ fn update(engine: &mut Engine, dt: f64) {
     engine.update_pos(dt);
     engine.resolve_collisons();
 }
-
-// fn check_collisions(engine: &mut Engine) {
-//     let n = engine.object_list.len();
-//     // let mut res = Vec::new();
-//     for i in 0..n {
-//         for j in i + 1..n {
-//             if let Some(p) = engine.object_list[i].is_colliding(&engine.object_list[j]) {
-//                 // resolve static collison for ith and jth circle
-//                 engine.object_list[i].point = p.0;
-//                 engine.object_list[j].point = p.1;
-//                 // collide and readjust velocit for ith and jth sphere
-//                 let vel = engine.object_list[i].collide(&engine.object_list[j], engine.e());
-//                 engine.object_list[i].v = vel.0;
-//                 engine.object_list[j].v = vel.1;
-//             }
-//         }
-//     }
-// }
-// ellipse(x,y,halfwidth,halfheight)
 
 fn main() {
     // commandline args
@@ -107,7 +88,7 @@ fn main() {
 
     println!("{:?}", (grav_state, n, e));
 
-    let screen = Screen::new(512.0, 512.0);
+    let screen = Screen::new(1280.0, 720.0);
 
     // initializing piston window
     let mut window: PistonWindow =
@@ -138,6 +119,14 @@ fn main() {
                 for circ in &eng.object_list {
                     // let cir = ellipse::circle(circ.x(), circ.y(), circ.r());
                     ellipse(circ.color(), circ.readjust(), c.transform, g);
+                    line_from_to(
+                        [0.0, 0.0, 0.0, 1.0],
+                        1.0,
+                        [circ.x(), circ.y()],
+                        [circ.x() + circ.r(), circ.y()],
+                        c.transform,
+                        g,
+                    );
                 }
             });
         }
