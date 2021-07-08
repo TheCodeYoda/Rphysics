@@ -90,22 +90,15 @@ impl Engine {
         }
     }
 
-    fn resolve_active_collisons(&mut self, active_list: &Vec<usize>, e: f64) {
-        let n = active_list.len();
-        for i in 0..n {
-            for j in i + 1..n {
-                let ind_i = active_list[i];
-                let ind_j = active_list[j];
-                if let Some(p) = self.object_list[ind_i].is_colliding(&self.object_list[ind_j]) {
-                    // resolve static collison for ith and jth circle
-                    self.object_list[ind_i].point = p.0;
-                    self.object_list[ind_j].point = p.1;
-                    // collide and readjust velocit for ith and jth sphere
-                    let vel = self.object_list[ind_i].collide(&self.object_list[ind_j], e);
-                    self.object_list[ind_i].v = vel.0;
-                    self.object_list[ind_j].v = vel.1;
-                }
-            }
+    fn resolve_active_collisons(&mut self, ind_i: usize, ind_j: usize, e: f64) {
+        if let Some(p) = self.object_list[ind_i].is_colliding(&self.object_list[ind_j]) {
+            // resolve static collison for ith and jth circle
+            self.object_list[ind_i].point = p.0;
+            self.object_list[ind_j].point = p.1;
+            // collide and readjust velocit for ith and jth sphere
+            let vel = self.object_list[ind_i].collide(&self.object_list[ind_j], e);
+            self.object_list[ind_i].v = vel.0;
+            self.object_list[ind_j].v = vel.1;
         }
     }
 
@@ -118,35 +111,26 @@ impl Engine {
 
         // active list contains circles which are overlapping in specified axis
         let mut active_list: Vec<usize> = Vec::new();
-        active_list.push(0);
 
-        let mut i = 1;
-
-        while i < n {
-            if !active_list.is_empty() {
-                let ind: usize = *active_list.last().unwrap();
-                let ob1 = vec3(
-                    self.object_list[i].x(),
-                    self.object_list[i].y(),
-                    self.object_list[i].r(),
-                );
-                let ob2 = vec3(
+        for i in 0..n {
+            active_list.push(i);
+            let ob_i = vec3(
+                self.object_list[i].x(),
+                self.object_list[i].y(),
+                self.object_list[i].r(),
+            );
+            for j in 0..active_list.len() {
+                let ind = active_list[j];
+                let ob_ind = vec3(
                     self.object_list[ind].x(),
                     self.object_list[ind].y(),
                     self.object_list[ind].r(),
                 );
-                if intersects(&ob1, &ob2) {
-                    active_list.push(i);
-                    i += 1;
-                    self.resolve_active_collisons(&active_list, self.e);
+                if intersects(&ob_i, &ob_ind) {
+                    self.resolve_active_collisons(i, ind, self.e);
                 } else {
-                    if !active_list.is_empty() {
-                        active_list.pop();
-                    }
+                    let _elem = active_list.swap_remove(j);
                 }
-            } else {
-                active_list.push(i);
-                i += 1;
             }
         }
 
