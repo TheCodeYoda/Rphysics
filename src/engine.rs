@@ -5,6 +5,13 @@ use crate::screen::Screen;
 extern crate nalgebra_glm as glm;
 use glm::*;
 
+fn intersects(a: &DVec2, b: &DVec2) -> bool {
+    if f64::min(b[0], b[1]) < f64::max(a[0], a[1]) {
+        return true;
+    }
+    return false;
+}
+
 pub struct Engine {
     g: DVec2,
     e: f64,
@@ -80,21 +87,63 @@ impl Engine {
         }
     }
 
-    pub fn resolve_collisons(&mut self) {
-        let n = self.object_list.len();
-        // let mut res = Vec::new();
+    fn resolve_active_collisons(&mut self, active_list: &Vec<usize>, e: f64) {
+        let n = active_list.len();
         for i in 0..n {
             for j in i + 1..n {
-                if let Some(p) = self.object_list[i].is_colliding(&self.object_list[j]) {
+                let ind_i = active_list[i];
+                let ind_j = active_list[j];
+                if let Some(p) = self.object_list[ind_i].is_colliding(&self.object_list[ind_j]) {
                     // resolve static collison for ith and jth circle
-                    self.object_list[i].point = p.0;
-                    self.object_list[j].point = p.1;
+                    self.object_list[ind_i].point = p.0;
+                    self.object_list[ind_j].point = p.1;
                     // collide and readjust velocit for ith and jth sphere
-                    let vel = self.object_list[i].collide(&self.object_list[j], self.e());
-                    self.object_list[i].v = vel.0;
-                    self.object_list[j].v = vel.1;
+                    let vel = self.object_list[ind_i].collide(&self.object_list[ind_j], e);
+                    self.object_list[ind_i].v = vel.0;
+                    self.object_list[ind_j].v = vel.1;
                 }
             }
         }
+    }
+
+    // implementing sweep and prune algo
+    pub fn resolve_collisons(&mut self) {
+        let n = self.object_list.len();
+        // let mut res = Vec::new();
+        self.object_list
+            .sort_by(|a, b| a.y().partial_cmp(&b.y()).unwrap());
+
+        let mut active_list: Vec<usize> = Vec::new();
+        active_list.push(0);
+
+        for i in 1..n {
+            if !active_list.is_empty() {
+                let ind: usize = *active_list.last().unwrap();
+                if intersects(&self.object_list[i].point, &self.object_list[ind].point) {
+                    active_list.push(i);
+                    self.resolve_active_collisons(&active_list, self.e);
+                } else {
+                    while !active_list.is_empty() {
+                        active_list.pop();
+                    }
+                }
+            } else {
+                active_list.push(i);
+            }
+        }
+
+        // for i in 0..n {
+        //     for j in i + 1..n {
+        //         if let Some(p) = self.object_list[i].is_colliding(&self.object_list[j]) {
+        //             // resolve static collison for ith and jth circle
+        //             self.object_list[i].point = p.0;
+        //             self.object_list[j].point = p.1;
+        //             // collide and readjust velocit for ith and jth sphere
+        //             let vel = self.object_list[i].collide(&self.object_list[j], self.e());
+        //             self.object_list[i].v = vel.0;
+        //             self.object_list[j].v = vel.1;
+        //         }
+        //     }
+        // }
     }
 }
