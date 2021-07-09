@@ -17,7 +17,7 @@ Example
 
 ## Simulations
 
-### Elastic collison
+### Elastic collisons
 ![Elastic Collisons](/gifs/collision.gif)
 ### Gravity
 ![Gravity](/gifs/gravity.gif)
