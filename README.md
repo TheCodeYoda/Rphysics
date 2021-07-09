@@ -6,6 +6,7 @@ A simple Physics simulation written completely in Rust which supports
 ## Usage
 
 > **_NOTE:_**  0.0 <= Coeffecient of restitiution <= 1.0
+> **_NOTE:_**  rust version 1.47.0 required
 
 1. Clone the repo
 2. cd Rphysics/
