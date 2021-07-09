@@ -8,7 +8,9 @@ use glm::*;
 fn intersects(a: &DVec3, b: &DVec3) -> bool {
     let aabb1 = [a[0] - a[2], a[0] + a[2]];
     let aabb2 = [b[0] - b[2], b[0] + b[2]];
-
+    if aabb1 == aabb2 {
+        return false;
+    }
     if f64::min(aabb2[0], aabb2[1]) < f64::max(aabb1[0], aabb1[1]) {
         return true;
     }
@@ -107,33 +109,24 @@ impl Engine {
         let n = self.object_list.len();
         // sort according to x axis
         self.object_list
-            .sort_by(|a, b| a.x().partial_cmp(&b.x()).unwrap());
+            .sort_by(|a, b| (a.x() - a.r()).partial_cmp(&(b.x() - b.r())).unwrap());
 
         // active list contains circles which are overlapping in specified axis
-        let mut active_list: Vec<usize> = Vec::new();
-
-        for i in 0..n {
-            active_list.push(i);
-            let ob_i = vec3(
-                self.object_list[i].x(),
-                self.object_list[i].y(),
-                self.object_list[i].r(),
-            );
-            for j in 0..active_list.len() {
-                let ind = active_list[j];
-                let ob_ind = vec3(
-                    self.object_list[ind].x(),
-                    self.object_list[ind].y(),
-                    self.object_list[ind].r(),
-                );
-                if intersects(&ob_i, &ob_ind) {
-                    self.resolve_active_collisons(i, ind, self.e);
+        (0..n).for_each(|i| {
+            ((i + 1)..n).try_for_each(|j| {
+                let obj_i = &self.object_list[i];
+                let obj_i = vec3(obj_i.x(), obj_i.y(), obj_i.r());
+                let obj_j = &self.object_list[j];
+                let obj_j = vec3(obj_j.x(), obj_j.y(), obj_j.r());
+                if intersects(&obj_i, &obj_j) {
+                    self.resolve_active_collisons(i, j, self.e);
+                    return Some(());
                 } else {
-                    let _elem = active_list.swap_remove(j);
+                    // return Some(());
+                    return None;
                 }
-            }
-        }
-
+            });
+        });
         // for i in 0..n {
         //     for j in i + 1..n {
         //         if let Some(p) = self.object_list[i].is_colliding(&self.object_list[j]) {
