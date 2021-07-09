@@ -7,7 +7,7 @@ A simple Physics simulation written completely in Rust which supports
 
 > **_NOTE:_**  0.0 <= Coeffecient of restitiution <= 1.0
 
-1. Clone the repo using the link [https://github.com/TheCodeYoda/Rphysics.git]
+1. Clone the repo
 2. cd Rphysics/
 3. cargo run [gravity state] [no.of circles] [coeffecient of restitiution]
 
