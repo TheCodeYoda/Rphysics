@@ -17,5 +17,7 @@ Example
 
 ## Simulations
 
+* Elastic Collisons
 ![Alt Text](/gifs/collision.gif)
+* Gravity 
 ![Alt Text](/gifs/gravity.gif)
