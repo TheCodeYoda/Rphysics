@@ -58,8 +58,8 @@ fn get_circles(engine: &mut Engine, n: u32) {
 
     // ------------------custom testing ----------------------------
     // let circ_1 = Circle::new(50.0, 50.0, 50.0, 0.0, 0.0);
-    // let circ_2 = Circle::new(50.0, 462.0, 50.0, 0.0, 0.0);
-    // engine.object_list = vec![circ_2];
+    // let circ_2 = Circle::new(462.0, 50.0, 50.0, -30.0, 0.0);
+    // engine.object_list = vec![circ_1, circ_2];
 
     // --------------------------random testing -------------------------------------
     for _i in 0..n {
@@ -88,7 +88,7 @@ fn main() {
 
     println!("{:?}", (grav_state, n, e));
 
-    let screen = Screen::new(1280.0, 720.0);
+    let screen = Screen::new(512.0, 512.0);
 
     // initializing piston window
     let mut window: PistonWindow =

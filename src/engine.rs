@@ -43,7 +43,7 @@ impl Engine {
     }
 
     pub fn gravity_on(&mut self) {
-        self.g = vec2(0.0, 30.0);
+        self.g = vec2(0.0, 100.0);
         for circ in self.object_list.iter_mut() {
             circ.force += circ.mass * self.g;
         }
