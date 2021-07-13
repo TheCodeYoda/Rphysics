@@ -124,22 +124,22 @@ impl Collision for Circle {
         return vec2(0.0, 0.0);
     }
 
-    fn is_colliding(&self, other: &Circle) -> Option<(DVec2, DVec2)> {
+    fn is_colliding(&mut self, other: &mut Circle) -> bool {
         let dist = distance(self.x(), self.y(), other.x(), other.y());
         if dist <= self.r() + other.r() {
             let overlap = 0.5 * (dist - self.r() - other.r());
 
             // resolve static collison by displacing them away iif they are overlapping
             // move self,other away by 0.5 of overlap in unit vector direction
-            let self_point = self.point - overlap * ((self.point - other.point) / dist);
-            let other_point = other.point + overlap * ((self.point - other.point) / dist);
+            self.point = self.point - overlap * ((self.point - other.point) / dist);
+            other.point = other.point + overlap * ((self.point - other.point) / dist);
 
-            return Some((self_point, other_point));
+            return true;
         }
-        return None;
+        return false;
     }
 
-    fn collide(&self, other: &Circle, e: f64) -> (DVec2, DVec2) {
+    fn collide(&mut self, other: &mut Circle, e: f64, dt: f64) {
         //Conserve energy and momentum look at wikipedia for elastic collisons
         // let total_mass = self.mass + other.mass;
         // let mass_ratio_1 = (2.0 * other.mass) / total_mass;
@@ -173,13 +173,14 @@ impl Collision for Circle {
 
         // calculate impulse scalar
         let mut j = -(1.0 + e) * vel_normal;
-        j /= 1.0 / self.mass + 1.0 / other.mass;
+        j = j / (1.0 / self.mass + 1.0 / other.mass);
 
         //apply impulse
         let impulse = j * normal;
-        let vel_self = self.v - ((1.0 / self.mass) * impulse);
-        let vel_other = other.v + ((1.0 / other.mass) * impulse);
-        println!("{:?}", (length(&normal), vel_self, vel_other));
-        return (vel_self, vel_other);
+        // self.add_force(-impulse * dt);
+        // other.add_force(impulse * dt);
+        self.v = self.v - ((1.0 / self.mass) * impulse);
+        other.v = other.v + ((1.0 / other.mass) * impulse);
+        // return (vel_self, vel_other);
     }
 }
