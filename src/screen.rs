@@ -7,7 +7,6 @@ use glm::*;
 pub struct Screen {
     width: f64,
     height: f64,
-    poc: DVec2,
 }
 
 impl Screen {
@@ -15,7 +14,6 @@ impl Screen {
         return Screen {
             width: width,
             height: height,
-            poc: vec2(0.0, 0.0),
         };
     }
 
@@ -34,22 +32,18 @@ impl Collision for Screen {
         let height = self.height();
         // hits right side wall
         if other.point[0] + other.r() > width {
-            self.poc = vec2(other.point[0] + other.r(), other.point[1]);
             return true;
         }
         // hits lower wall
         if other.point[1] + other.r() > height {
-            self.poc = vec2(other.point[0], other.point[1] + other.r());
             return true;
         }
         // hits left side wall
         if other.point[0] - other.r() < 0.0 {
-            self.poc = vec2(other.point[0] - other.r(), other.point[1]);
             return true;
         }
         // hits upper wall
         if other.point[1] - other.r() < 0.0 {
-            self.poc = vec2(other.point[0], other.point[1] - other.r());
             return true;
         }
         return false;
@@ -57,8 +51,24 @@ impl Collision for Screen {
 
     fn collide(&mut self, other: &mut Circle, e: f64, dt: f64) {
         let rv = other.v;
+        let mut poc = vec2(0.0, 0.0);
+        if other.point[0] + other.r() > self.width {
+            poc = vec2(other.point[0] + other.r(), other.point[1]);
+        }
+        // hits lower wall
+        if other.point[1] + other.r() > self.height {
+            poc = vec2(other.point[0], other.point[1] + other.r());
+        }
+        // hits left side wall
+        if other.point[0] - other.r() < 0.0 {
+            poc = vec2(other.point[0] - other.r(), other.point[1]);
+        }
+        // hits upper wall
+        if other.point[1] - other.r() < 0.0 {
+            poc = vec2(other.point[0], other.point[1] - other.r());
+        }
 
-        let normal = (self.poc - other.point) / length(&(self.poc - other.point));
+        let normal = (poc - other.point) / length(&(poc - other.point));
 
         let vel_normal = dot(&rv, &normal);
 

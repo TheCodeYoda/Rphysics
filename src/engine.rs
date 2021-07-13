@@ -65,7 +65,6 @@ impl Engine {
     }
 
     pub fn update_pos(&mut self, dt: f64) {
-        self.check_border(dt);
         for circ in &mut self.object_list {
             // println!("{:?}", (circ.force, dt));
             let acc = circ.force / circ.mass;
