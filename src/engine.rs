@@ -73,7 +73,7 @@ impl Engine {
         }
     }
 
-    pub fn check_border(&mut self, dt: f64) {
+    pub fn resolve_wall_collisions(&mut self, dt: f64) {
         for circ in &mut self.object_list {
             if self.screen.is_colliding(circ) {
                 self.screen.collide(circ, self.e, dt);

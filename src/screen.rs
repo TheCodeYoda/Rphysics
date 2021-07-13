@@ -31,19 +31,23 @@ impl Collision for Screen {
         let width = self.width();
         let height = self.height();
         // hits right side wall
-        if other.point[0] + other.r() > width {
+        if other.point[0] + other.r() > width && other.v[0] > 0.0 {
+            // other.point = vec2(width - other.r(), other.point[1]);
             return true;
         }
         // hits lower wall
-        if other.point[1] + other.r() > height {
+        if other.point[1] + other.r() > height && other.v[1] > 0.0 {
+            // other.point = vec2(other.point[0], height - other.r());
             return true;
         }
         // hits left side wall
-        if other.point[0] - other.r() < 0.0 {
+        if other.point[0] - other.r() < 0.0 && other.v[0] < 0.0 {
+            // other.point = vec2(other.r(), other.point[1]);
             return true;
         }
         // hits upper wall
-        if other.point[1] - other.r() < 0.0 {
+        if other.point[1] - other.r() < 0.0 && other.v[1] < 0.0 {
+            // other.point = vec2(other.point[1], other.r());
             return true;
         }
         return false;
@@ -68,7 +72,7 @@ impl Collision for Screen {
             poc = vec2(other.point[0], other.point[1] - other.r());
         }
 
-        let normal = (poc - other.point) / length(&(poc - other.point));
+        let normal = (other.point - poc) / length(&(other.point - poc));
 
         let vel_normal = dot(&rv, &normal);
 
