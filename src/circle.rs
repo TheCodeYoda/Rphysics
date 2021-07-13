@@ -141,21 +141,45 @@ impl Collision for Circle {
 
     fn collide(&self, other: &Circle, e: f64) -> (DVec2, DVec2) {
         //Conserve energy and momentum look at wikipedia for elastic collisons
-        let total_mass = self.mass + other.mass;
-        let mass_ratio_1 = (2.0 * other.mass) / total_mass;
-        let mass_ratio_2 = (2.0 * self.mass) / total_mass;
+        // let total_mass = self.mass + other.mass;
+        // let mass_ratio_1 = (2.0 * other.mass) / total_mass;
+        // let mass_ratio_2 = (2.0 * self.mass) / total_mass;
 
-        let v1 = self.v;
-        let v2 = other.v;
-        let x1 = self.point;
-        let x2 = other.point;
+        // let v1 = self.v;
+        // let v2 = other.v;
+        // let x1 = self.point;
+        // let x2 = other.point;
 
-        let dot_1 = dot(&(v1 - v2), &(x1 - x2));
-        let self_v = e * (self.v - (mass_ratio_1 * (dot_1 / length2(&(x1 - x2))) * (x1 - x2)));
+        // let dot_1 = dot(&(v1 - v2), &(x1 - x2));
+        // let self_v = e * (self.v - (mass_ratio_1 * (dot_1 / length2(&(x1 - x2))) * (x1 - x2)));
 
-        let dot_2 = dot(&(v2 - v1), &(x2 - x1));
-        let other_v = e * (other.v - (mass_ratio_2 * (dot_2 / length2(&(x2 - x1))) * (x2 - x1)));
+        // let dot_2 = dot(&(v2 - v1), &(x2 - x1));
+        // let other_v = e * (other.v - (mass_ratio_2 * (dot_2 / length2(&(x2 - x1))) * (x2 - x1)));
 
-        return (self_v, other_v);
+        // return (self_v, other_v);
+
+        // calculate relative velocity
+        let rv = other.v - self.v;
+
+        let normal = (other.point - self.point) / length(&(other.point - self.point));
+
+        // calculate rv along normal
+        let vel_normal = dot(&rv, &normal);
+
+        // do not resolve if velocities are separating
+        // if vel_normal > 0.0 {
+        //     return (self.v, other.v);
+        // }
+
+        // calculate impulse scalar
+        let mut j = -(1.0 + e) * vel_normal;
+        j /= 1.0 / self.mass + 1.0 / other.mass;
+
+        //apply impulse
+        let impulse = j * normal;
+        let vel_self = self.v - ((1.0 / self.mass) * impulse);
+        let vel_other = other.v + ((1.0 / other.mass) * impulse);
+        println!("{:?}", (length(&normal), vel_self, vel_other));
+        return (vel_self, vel_other);
     }
 }
