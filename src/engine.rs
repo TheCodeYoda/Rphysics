@@ -65,26 +65,20 @@ impl Engine {
     }
 
     pub fn update_pos(&mut self, dt: f64) {
+        self.check_border(dt);
         for circ in &mut self.object_list {
-            // circ.point[0] += circ.v[0] * dt;
-            // // v = u+at;
-            // if circ.point[1] + circ.r() < self.screen.height() {
-            //     circ.v[1] = circ.v[1] + self.g * dt;
-            // }
-            // circ.point[1] += circ.v[1] * dt;
-            // println!("{:?}", (circ.point));
-            let normal_reaction = circ.check_bounds(&self.screen, self.e);
-            let net_force = circ.force + normal_reaction;
-            // println!("{:?}", (circ.force, net_force));
-            let acc = net_force / circ.mass;
+            // println!("{:?}", (circ.force, dt));
+            let acc = circ.force / circ.mass;
             circ.v = circ.v + (acc * dt);
             circ.point = circ.point + (circ.v * dt);
         }
     }
 
-    pub fn check_border(&mut self) {
+    pub fn check_border(&mut self, dt: f64) {
         for circ in &mut self.object_list {
-            circ.check_bounds(&self.screen, self.e);
+            if self.screen.is_colliding(circ) {
+                self.screen.collide(circ, self.e, dt);
+            }
         }
     }
     // implementing sweep and prune algo
