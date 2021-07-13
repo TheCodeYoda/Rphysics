@@ -90,40 +90,6 @@ impl Circle {
 }
 
 impl Collision for Circle {
-    /// consider collison with the wall
-    fn check_bounds(&mut self, screen: &Screen, e: f64) -> DVec2 {
-        let width = screen.width();
-        let height = screen.height();
-        // hits right side wall
-        if self.point[0] + self.r > width && self.v[0] >= 0.0 {
-            self.v[0] = -e * self.v[0];
-            self.point[0] = width - self.r;
-            return vec2(-self.force[0], self.force[1]);
-        }
-        // hits lower wall
-        if self.point[1] + self.r > height && self.v[1] >= 0.0 {
-            self.v[1] = -e * self.v[1];
-            self.point[1] = height - self.r;
-            return vec2(self.force[0], -self.force[1]);
-            // let net_force = self.mass * self.a;
-            // let normal_reaction = -net_force;
-            // self.a = (net_force + normal_reaction) / self.mass;
-        }
-        // hits left side wall
-        if self.point[0] - self.r < 0.0 && self.v[0] <= 0.0 {
-            self.v[0] = -e * self.v[0];
-            self.point[0] = self.r;
-            return vec2(-self.force[0], self.force[1]);
-        }
-        // hits upper wall
-        if self.point[1] - self.r < 0.0 && self.v[1] <= 0.0 {
-            self.v[1] = -e * self.v[1];
-            self.point[1] = self.r;
-            return vec2(self.force[0], -self.force[1]);
-        }
-        return vec2(0.0, 0.0);
-    }
-
     fn is_colliding(&mut self, other: &mut Circle) -> bool {
         let dist = distance(self.x(), self.y(), other.x(), other.y());
         if dist <= self.r() + other.r() {
@@ -175,12 +141,13 @@ impl Collision for Circle {
         let mut j = -(1.0 + e) * vel_normal;
         j = j / (1.0 / self.mass + 1.0 / other.mass);
 
-        //apply impulse
+        // apply impulse
         let impulse = j * normal;
-        // self.add_force(-impulse * dt);
-        // other.add_force(impulse * dt);
-        self.v = self.v - ((1.0 / self.mass) * impulse);
-        other.v = other.v + ((1.0 / other.mass) * impulse);
-        // return (vel_self, vel_other);
+
+        // F.dt = J
+        // self.add_force(-impulse / dt);
+        // other.add_force(impulse / dt);
+        self.v = self.v - (1.0 / self.mass * impulse);
+        other.v = other.v + (1.0 / other.mass * impulse);
     }
 }
