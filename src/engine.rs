@@ -67,7 +67,8 @@ impl Engine {
     pub fn update_pos(&mut self, dt: f64) {
         for circ in &mut self.object_list {
             // println!("{:?}", (circ.force, dt));
-            let acc = circ.force / circ.mass;
+            let net_force = circ.force + circ.mass * self.g;
+            let acc = net_force / circ.mass;
             circ.v = circ.v + (acc * dt);
             circ.point = circ.point + (circ.v * dt);
         }

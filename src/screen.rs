@@ -32,53 +32,58 @@ impl Collision for Screen {
         let height = self.height();
         // hits right side wall
         if other.point[0] + other.r() > width && other.v[0] > 0.0 {
-            // other.point = vec2(width - other.r(), other.point[1]);
             return true;
         }
         // hits lower wall
         if other.point[1] + other.r() > height && other.v[1] > 0.0 {
-            // other.point = vec2(other.point[0], height - other.r());
             return true;
         }
         // hits left side wall
         if other.point[0] - other.r() < 0.0 && other.v[0] < 0.0 {
-            // other.point = vec2(other.r(), other.point[1]);
             return true;
         }
         // hits upper wall
         if other.point[1] - other.r() < 0.0 && other.v[1] < 0.0 {
-            // other.point = vec2(other.point[1], other.r());
             return true;
         }
         return false;
     }
 
     fn collide(&mut self, other: &mut Circle, e: f64, dt: f64) {
-        let rv = other.v;
-        let mut poc = vec2(0.0, 0.0);
+        fn apply_impulse(other: &mut Circle, poc: DVec2, e: f64) {
+            let rv = other.v;
+            let normal = (other.point - poc) / length(&(other.point - poc));
+
+            let vel_normal = dot(&rv, &normal);
+
+            let j_mag = -vel_normal * (1.0 + e) / (1.0 / other.mass);
+            let impulse = j_mag * normal;
+            // println!("{:?}", (other.v, impulse, vel_normal));
+            other.v = other.v + (1.0 / other.mass * impulse);
+        }
+
         if other.point[0] + other.r() > self.width {
-            poc = vec2(other.point[0] + other.r(), other.point[1]);
+            let poc = vec2(other.point[0] + other.r(), other.point[1]);
+            other.point = vec2(self.width - other.r(), other.point[1]);
+            apply_impulse(other, poc, e);
         }
         // hits lower wall
         if other.point[1] + other.r() > self.height {
-            poc = vec2(other.point[0], other.point[1] + other.r());
+            let poc = vec2(other.point[0], other.point[1] + other.r());
+            other.point = vec2(other.point[0], self.height - other.r());
+            apply_impulse(other, poc, e);
         }
         // hits left side wall
         if other.point[0] - other.r() < 0.0 {
-            poc = vec2(other.point[0] - other.r(), other.point[1]);
+            let poc = vec2(0.0, other.point[1]);
+            other.point = vec2(other.r(), other.point[1]);
+            apply_impulse(other, poc, e);
         }
         // hits upper wall
         if other.point[1] - other.r() < 0.0 {
-            poc = vec2(other.point[0], other.point[1] - other.r());
+            let poc = vec2(other.point[0], 0.0);
+            other.point = vec2(other.point[0], other.r());
+            apply_impulse(other, poc, e);
         }
-
-        let normal = (other.point - poc) / length(&(other.point - poc));
-
-        let vel_normal = dot(&rv, &normal);
-
-        let j_mag = -vel_normal * (1.0 + e) / (1.0 / other.mass);
-        let impulse = j_mag * normal;
-
-        other.v = other.v + (1.0 / other.mass * impulse);
     }
 }
