@@ -9,7 +9,7 @@ use rphysics::engine::*;
 use rphysics::screen::*;
 
 /// randomly spawns Non overlapping circles in the Screen
-fn get_circle(list: &Vec<Circle>, screen: &Screen) -> Option<Circle> {
+fn get_circle(list: &mut Vec<Circle>, screen: &Screen) -> Option<Circle> {
     let mut tries = 100000;
     while tries > 0 {
         // rand handle
@@ -22,7 +22,7 @@ fn get_circle(list: &Vec<Circle>, screen: &Screen) -> Option<Circle> {
         let width = screen.width();
         let height = screen.height();
 
-        let circ = Circle::new(
+        let mut circ = Circle::new(
             rng.gen_range(0.0, width),
             rng.gen_range(0.0, height),
             rng.gen_range(min_radius, max_radius),
@@ -30,15 +30,17 @@ fn get_circle(list: &Vec<Circle>, screen: &Screen) -> Option<Circle> {
             rng.gen_range(min_vel, max_vel),
         );
         let mut flag = 1;
-        for sample in list {
-            if let Some(_) = circ.is_colliding(&sample) {
+        for sample in list.iter_mut() {
+            if circ.is_colliding(sample) {
                 flag = 0;
                 break;
             }
         }
+
         if flag == 1 {
             return Some(circ);
         }
+
         tries -= 1;
     }
     return None;
@@ -57,21 +59,21 @@ fn get_circles(engine: &mut Engine, n: u32) {
     // return vec![circ_1, circ_2,circ_3];
 
     // ------------------custom testing ----------------------------
-    // let circ_1 = Circle::new(50.0, 50.0, 50.0, 0.0, 0.0);
-    // let circ_2 = Circle::new(462.0, 50.0, 50.0, -30.0, 0.0);
+    // let circ_1 = Circle::new(50.0, 50.0, 50.0, 100.0, 0.0);
+    // let circ_2 = Circle::new(462.0, 50.0, 50.0, -100.0, 0.0);
     // engine.object_list = vec![circ_1, circ_2];
 
     // --------------------------random testing -------------------------------------
     for _i in 0..n {
-        if let Some(circ) = get_circle(&engine.object_list, &engine.screen) {
+        if let Some(circ) = get_circle(&mut engine.object_list, &engine.screen) {
             engine.object_list.push(circ);
         }
     }
 }
 
 fn update(engine: &mut Engine, dt: f64) {
+    engine.resolve_collisons(dt);
     engine.update_pos(dt);
-    engine.resolve_collisons();
 }
 
 fn main() {
