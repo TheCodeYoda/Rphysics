@@ -72,8 +72,8 @@ fn get_circles(engine: &mut Engine, n: u32) {
 }
 
 fn update(engine: &mut Engine, dt: f64) {
-    engine.resolve_collisons(dt);
     engine.update_pos(dt);
+    engine.resolve_collisons(dt);
 }
 
 fn main() {

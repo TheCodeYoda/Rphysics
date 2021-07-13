@@ -94,12 +94,11 @@ impl Engine {
         // self.object_list
         //     .sort_by(|a, b| (a.x() - a.r()).partial_cmp(&(b.x() - b.r())).unwrap());
         // active list contains circles which are overlapping in specified axis
-        (0..n).for_each(|i| {
-            ((i + 1)..n).try_for_each(|j| {
+        for i in 0..n {
+            for j in i + 1..n {
                 let (left, right) = self.object_list.split_at_mut(j);
-                resolve_active_collisons(&mut right[0], &mut left[j - 1], self.e, dt);
-                return Some(());
-            });
-        });
+                resolve_active_collisons(&mut left[i], &mut right[0], self.e, dt);
+            }
+        }
     }
 }
