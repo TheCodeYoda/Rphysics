@@ -5,16 +5,11 @@ use crate::screen::Screen;
 extern crate nalgebra_glm as glm;
 use glm::*;
 
-fn intersects(a: &DVec3, b: &DVec3) -> bool {
-    let aabb1 = [a[0] - a[2], a[0] + a[2]];
-    let aabb2 = [b[0] - b[2], b[0] + b[2]];
-    if aabb1 == aabb2 {
-        return false;
+fn resolve_active_collisons(circ_1: &mut Circle, circ_2: &mut Circle, e: f64, dt: f64) {
+    if circ_1.is_colliding(circ_2) {
+        // collide and readjust velocit for ith and jth sphere
+        circ_1.collide(circ_2, e, dt);
     }
-    if f64::min(aabb2[0], aabb2[1]) < f64::max(aabb1[0], aabb1[1]) {
-        return true;
-    }
-    return false;
 }
 
 pub struct Engine {
@@ -80,6 +75,7 @@ impl Engine {
             // println!("{:?}", (circ.point));
             let normal_reaction = circ.check_bounds(&self.screen, self.e);
             let net_force = circ.force + normal_reaction;
+            // println!("{:?}", (circ.force, net_force));
             let acc = net_force / circ.mass;
             circ.v = circ.v + (acc * dt);
             circ.point = circ.point + (circ.v * dt);
@@ -91,54 +87,19 @@ impl Engine {
             circ.check_bounds(&self.screen, self.e);
         }
     }
-
-    fn resolve_active_collisons(&mut self, ind_i: usize, ind_j: usize, e: f64) {
-        if let Some(p) = self.object_list[ind_i].is_colliding(&self.object_list[ind_j]) {
-            // resolve static collison for ith and jth circle
-            self.object_list[ind_i].point = p.0;
-            self.object_list[ind_j].point = p.1;
-            // collide and readjust velocit for ith and jth sphere
-            let vel = self.object_list[ind_i].collide(&self.object_list[ind_j], e);
-            self.object_list[ind_i].v = vel.0;
-            self.object_list[ind_j].v = vel.1;
-        }
-    }
-
     // implementing sweep and prune algo
-    pub fn resolve_collisons(&mut self) {
+    pub fn resolve_collisons(&mut self, dt: f64) {
         let n = self.object_list.len();
         // sort according to x axis
-        self.object_list
-            .sort_by(|a, b| (a.x() - a.r()).partial_cmp(&(b.x() - b.r())).unwrap());
-
+        // self.object_list
+        //     .sort_by(|a, b| (a.x() - a.r()).partial_cmp(&(b.x() - b.r())).unwrap());
         // active list contains circles which are overlapping in specified axis
         (0..n).for_each(|i| {
             ((i + 1)..n).try_for_each(|j| {
-                let obj_i = &self.object_list[i];
-                let obj_i = vec3(obj_i.x(), obj_i.y(), obj_i.r());
-                let obj_j = &self.object_list[j];
-                let obj_j = vec3(obj_j.x(), obj_j.y(), obj_j.r());
-                if intersects(&obj_i, &obj_j) {
-                    self.resolve_active_collisons(i, j, self.e);
-                    return Some(());
-                } else {
-                    // return Some(());
-                    return None;
-                }
+                let (left, right) = self.object_list.split_at_mut(j);
+                resolve_active_collisons(&mut right[0], &mut left[j - 1], self.e, dt);
+                return Some(());
             });
         });
-        // for i in 0..n {
-        //     for j in i + 1..n {
-        //         if let Some(p) = self.object_list[i].is_colliding(&self.object_list[j]) {
-        //             // resolve static collison for ith and jth circle
-        //             self.object_list[i].point = p.0;
-        //             self.object_list[j].point = p.1;
-        //             // collide and readjust velocit for ith and jth sphere
-        //             let vel = self.object_list[i].collide(&self.object_list[j], self.e());
-        //             self.object_list[i].v = vel.0;
-        //             self.object_list[j].v = vel.1;
-        //         }
-        //     }
-        // }
     }
 }
