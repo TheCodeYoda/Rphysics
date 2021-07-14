@@ -112,6 +112,12 @@ fn main() {
         eng.gravity_on();
     }
 
+    // info to draw line on mouse clicks
+    let mut start_point: [f64; 2] = [0.0, 0.0];
+    let mut end_point: [f64; 2] = [0.0, 0.0];
+    let mut state = 0;
+    let mut prev_state = 0;
+
     // render loop
     while let Some(event) = window.next() {
         // this is for rendering
@@ -130,9 +136,48 @@ fn main() {
                         c.transform,
                         g,
                     );
+                    if state == 1 {
+                        println!("{:?} {:?}", start_point, end_point);
+                        line_from_to(
+                            [0.0, 1.0, 0.0, 1.0],
+                            2.0,
+                            start_point,
+                            end_point,
+                            c.transform,
+                            g,
+                        );
+                    }
                 }
             });
         }
+
+        // mouse_cursor_args -> returns position of mouse
+        if let Event::Input(input) = &event {
+            if let Input::Button(button_args) = input {
+                if let Button::Mouse(key) = button_args.button {
+                    // println!("Key event: {:?} {:?} ", key, button_args.state);
+                    if key == MouseButton::Left {
+                        prev_state = state;
+                        if button_args.state == ButtonState::Press {
+                            state = 1;
+                        } else {
+                            state = 0;
+                        }
+                    }
+                }
+            }
+        }
+
+        if let Some(pos) = event.mouse_cursor_args() {
+            if state == 1 && prev_state == 0 {
+                start_point = pos;
+            }
+
+            if state == 0 && prev_state == 1 {
+                end_point = pos;
+            }
+        }
+
         // this is for updation of movement of shapes
         if let Some(u) = event.update_args() {
             // update position according to speed after every unit of time in simulation
