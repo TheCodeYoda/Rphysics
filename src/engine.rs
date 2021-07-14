@@ -71,6 +71,11 @@ impl Engine {
             let acc = net_force / circ.mass;
             circ.v = circ.v + (acc * dt);
             circ.point = circ.point + (circ.v * dt);
+
+            // clamping velocities
+            if (circ.v[0] * circ.v[0]) + (circ.v[1] * circ.v[1]) <= 0.01 {
+                circ.v = vec2(0.0, 0.0);
+            }
         }
     }
 
