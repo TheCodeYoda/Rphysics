@@ -101,9 +101,6 @@ fn main() {
             .build()
             .unwrap();
 
-    // list of circles to render
-    // let mut circ_list = get_circles(&screen, n);
-
     // engine object
     let mut eng = Engine::new(e, screen);
 
@@ -116,7 +113,6 @@ fn main() {
 
     // info to draw line on mouse clicks
     let mut start_point: [f64; 2] = [0.0, 0.0];
-    // let mut end_point: [f64; 2] = [0.0, 0.0];
     let mut curr_pos: [f64; 2] = [0.0, 0.0];
     let mut state = 0;
     let mut prev_state = 0;
@@ -129,7 +125,6 @@ fn main() {
                 // background color
                 clear([0.5, 0.5, 0.5, 1.0], g);
                 for circ in &eng.object_list {
-                    // let cir = ellipse::circle(circ.x(), circ.y(), circ.r());
                     ellipse(circ.color(), circ.readjust(), c.transform, g);
                     line_from_to(
                         [0.0, 0.0, 0.0, 1.0],
@@ -139,9 +134,9 @@ fn main() {
                         c.transform,
                         g,
                     );
-                    // println!("{} {} {}", "--->", state, prev_state);
+
+                    // draw impulse line
                     if state == 1 && prev_state == 1 {
-                        // println!("{:?} {:?}", start_point, end_point);
                         line_from_to(
                             [0.0, 1.0, 0.0, 1.0],
                             2.0,
@@ -150,7 +145,6 @@ fn main() {
                             c.transform,
                             g,
                         );
-                        // end_point = start_point;
                     }
                 }
             });
@@ -162,7 +156,6 @@ fn main() {
             if let Input::Button(button_args) = input {
                 if let Button::Mouse(key) = button_args.button {
                     // println!("Key event: {:?} {:?} ", key, button_args.state);
-
                     if key == MouseButton::Left {
                         if button_args.state == ButtonState::Press {
                             state = 1;
@@ -170,17 +163,15 @@ fn main() {
                             state = 0;
                         }
                     }
-                    println!("{} {}", state, prev_state);
+
                     let mut _selected_circ: Option<&mut Circle> = None;
                     if state == 1 && prev_state == 0 {
                         start_point = curr_pos;
                     } else if state == 0 && prev_state == 1 {
-                        _selected_circ = eng.give_circle(vec2(start_point[0], start_point[1]));
-                        if let Some(c) = _selected_circ {
-                            let impulse =
-                                vec2(curr_pos[0] - start_point[0], curr_pos[1] - start_point[1]);
-                            c.apply_impulse(impulse * 1000.0);
-                        }
+                        eng.mouse_impulse(
+                            vec2(start_point[0], start_point[1]),
+                            vec2(curr_pos[0], curr_pos[1]),
+                        );
                     }
                 }
             }
