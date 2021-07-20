@@ -15,8 +15,8 @@ fn get_circle(list: &mut Vec<Circle>, screen: &Screen) -> Option<Circle> {
         // rand handle
         let mut rng = rand::thread_rng();
 
-        let min_vel = 600.0;
-        let max_vel = 700.0;
+        let _min_vel = 600.0;
+        let _max_vel = 700.0;
         let min_radius = 25.0;
         let max_radius = 30.0;
         let width = screen.width();
@@ -26,8 +26,8 @@ fn get_circle(list: &mut Vec<Circle>, screen: &Screen) -> Option<Circle> {
             rng.gen_range(0.0, width),
             rng.gen_range(0.0, height),
             rng.gen_range(min_radius, max_radius),
-            rng.gen_range(min_vel, max_vel),
-            rng.gen_range(min_vel, max_vel),
+            0.0,
+            0.0,
         );
         let mut flag = 1;
         for sample in list.iter_mut() {
@@ -114,7 +114,8 @@ fn main() {
 
     // info to draw line on mouse clicks
     let mut start_point: [f64; 2] = [0.0, 0.0];
-    let mut end_point: [f64; 2] = [0.0, 0.0];
+    // let mut end_point: [f64; 2] = [0.0, 0.0];
+    let mut curr_pos: [f64; 2] = [0.0, 0.0];
     let mut state = 0;
     let mut prev_state = 0;
 
@@ -136,46 +137,46 @@ fn main() {
                         c.transform,
                         g,
                     );
-                    if state == 1 {
-                        println!("{:?} {:?}", start_point, end_point);
+                    // println!("{} {} {}", "--->", state, prev_state);
+                    if state == 1 && prev_state == 1 {
+                        // println!("{:?} {:?}", start_point, end_point);
                         line_from_to(
                             [0.0, 1.0, 0.0, 1.0],
                             2.0,
                             start_point,
-                            end_point,
+                            curr_pos,
                             c.transform,
                             g,
                         );
+                        // end_point = start_point;
                     }
                 }
             });
         }
 
         // mouse_cursor_args -> returns position of mouse
+        prev_state = state;
         if let Event::Input(input) = &event {
             if let Input::Button(button_args) = input {
                 if let Button::Mouse(key) = button_args.button {
                     // println!("Key event: {:?} {:?} ", key, button_args.state);
+
                     if key == MouseButton::Left {
-                        prev_state = state;
                         if button_args.state == ButtonState::Press {
                             state = 1;
                         } else {
                             state = 0;
                         }
                     }
+                    if state == 1 && prev_state == 0 {
+                        start_point = curr_pos;
+                    }
+                    // println!("{} {}", state, prev_state);
                 }
             }
         }
-
         if let Some(pos) = event.mouse_cursor_args() {
-            if state == 1 && prev_state == 0 {
-                start_point = pos;
-            }
-
-            if state == 0 && prev_state == 1 {
-                end_point = pos;
-            }
+            curr_pos = pos;
         }
 
         // this is for updation of movement of shapes
