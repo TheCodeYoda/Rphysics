@@ -52,18 +52,27 @@ impl Engine {
         self.object_list.push(circ);
     }
 
-    pub fn give_circle(&mut self, point: DVec2) -> Option<&mut Circle> {
+    pub fn mouse_impulse(&mut self, start_point: DVec2, curr_pos: DVec2) {
+        let mut chosen_circ: Circle = Circle::new(0.0, 0.0, 0.0, 0.0, 0.0);
+        let mut flag = 0;
         for circ in &mut self.object_list {
-            println!("{} {}", circ.point, point);
-            if circ.point[0] - circ.r() <= point[0]
-                && circ.point[0] + circ.r() >= point[0]
-                && circ.point[1] - circ.r() <= point[1]
-                && circ.point[1] + circ.r() >= point[1]
+            if circ.point[0] - circ.r() <= start_point[0]
+                && circ.point[0] + circ.r() >= start_point[0]
+                && circ.point[1] - circ.r() <= start_point[1]
+                && circ.point[1] + circ.r() >= start_point[1]
             {
-                return Some(circ);
+                flag = 1;
+                chosen_circ = *circ;
+                break;
             }
         }
-        return None;
+        if flag == 1 {
+            let impulse = curr_pos - start_point;
+            self.object_list.retain(|x| x.point != chosen_circ.point);
+            chosen_circ.v = vec2(0.0, 0.0);
+            chosen_circ.apply_impulse(impulse * 5000.0);
+            self.add(chosen_circ);
+        }
     }
 
     pub fn update_pos(&mut self, dt: f64) {

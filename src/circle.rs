@@ -5,6 +5,7 @@ use glm::*;
 use rand::*;
 use std::f64::consts::PI;
 
+#[derive(Copy, Clone, Debug)]
 pub struct Circle {
     pub point: DVec2,
     r: f64,
