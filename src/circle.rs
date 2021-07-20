@@ -1,5 +1,4 @@
 use crate::collison::{distance, Collision};
-use crate::screen::Screen;
 
 extern crate nalgebra_glm as glm;
 use glm::*;
@@ -149,5 +148,9 @@ impl Collision for Circle {
         // other.add_force(impulse / dt);
         self.v = self.v - (1.0 / self.mass * impulse);
         other.v = other.v + (1.0 / other.mass * impulse);
+    }
+
+    fn apply_impulse(&mut self, impulse: DVec2) {
+        self.v = self.v - (1.0 / self.mass * impulse);
     }
 }

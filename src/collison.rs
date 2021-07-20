@@ -1,4 +1,5 @@
 use crate::circle::Circle;
+use glm::*;
 
 extern crate nalgebra_glm as glm;
 
@@ -12,4 +13,5 @@ pub fn distance(x1: f64, y1: f64, x2: f64, y2: f64) -> f64 {
 pub trait Collision {
     fn is_colliding(&mut self, other: &mut Circle) -> bool;
     fn collide(&mut self, other: &mut Circle, e: f64, dt: f64);
+    fn apply_impulse(&mut self, impulse: DVec2);
 }
