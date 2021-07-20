@@ -2,6 +2,8 @@ use piston_window::*;
 // use std::f64::consts::PI;
 use rand::*;
 use std::env;
+extern crate nalgebra_glm as glm;
+use glm::*;
 
 use rphysics::circle::*;
 use rphysics::collison::*;
@@ -23,8 +25,8 @@ fn get_circle(list: &mut Vec<Circle>, screen: &Screen) -> Option<Circle> {
         let height = screen.height();
 
         let mut circ = Circle::new(
-            rng.gen_range(0.0, width),
-            rng.gen_range(0.0, height),
+            rng.gen_range(max_radius, width - max_radius),
+            rng.gen_range(max_radius, height - max_radius),
             rng.gen_range(min_radius, max_radius),
             0.0,
             0.0,
@@ -91,7 +93,7 @@ fn main() {
 
     println!("{:?}", (grav_state, n, e));
 
-    let screen = Screen::new(512.0, 512.0);
+    let screen = Screen::new(1280.0, 720.0);
 
     // initializing piston window
     let mut window: PistonWindow =
@@ -168,10 +170,18 @@ fn main() {
                             state = 0;
                         }
                     }
+                    println!("{} {}", state, prev_state);
+                    let mut _selected_circ: Option<&mut Circle> = None;
                     if state == 1 && prev_state == 0 {
                         start_point = curr_pos;
+                    } else if state == 0 && prev_state == 1 {
+                        _selected_circ = eng.give_circle(vec2(start_point[0], start_point[1]));
+                        if let Some(c) = _selected_circ {
+                            let impulse =
+                                vec2(curr_pos[0] - start_point[0], curr_pos[1] - start_point[1]);
+                            c.apply_impulse(impulse * 1000.0);
+                        }
                     }
-                    // println!("{} {}", state, prev_state);
                 }
             }
         }
