@@ -44,24 +44,26 @@ impl Engine {
         }
     }
 
-    pub fn add_gravity_force(&mut self) {
-        for circ in self.object_list.iter_mut() {
-            circ.force += circ.mass * self.g;
-        }
-    }
-
-    pub fn remove_gravity_force(&mut self) {
-        for circ in self.object_list.iter_mut() {
-            circ.force -= circ.mass * self.g;
-        }
-    }
-
     pub fn gravity_off(&mut self) {
         self.g = vec2(0.0, 0.0)
     }
 
     pub fn add(&mut self, circ: Circle) {
         self.object_list.push(circ);
+    }
+
+    pub fn give_circle(&mut self, point: DVec2) -> Option<&mut Circle> {
+        for circ in &mut self.object_list {
+            println!("{} {}", circ.point, point);
+            if circ.point[0] - circ.r() <= point[0]
+                && circ.point[0] + circ.r() >= point[0]
+                && circ.point[1] - circ.r() <= point[1]
+                && circ.point[1] + circ.r() >= point[1]
+            {
+                return Some(circ);
+            }
+        }
+        return None;
     }
 
     pub fn update_pos(&mut self, dt: f64) {
