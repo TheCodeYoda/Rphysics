@@ -19,7 +19,7 @@ pub struct Circle {
 }
 
 impl Circle {
-    pub fn new(x: f64, y: f64, r: f64, vel_x: f64, vel_y: f64, w: f64) -> Circle {
+    pub fn new(x: f64, y: f64, r: f64) -> Circle {
         let mut rng = rand::thread_rng();
         let color = [
             rng.gen_range(0.0, 1.0),
@@ -32,8 +32,8 @@ impl Circle {
             point: vec2(x, y),
             theta: 0.0,
             r: r,
-            v: vec2(vel_x, vel_y),
-            w: w,
+            v: vec2(0.0, 0.0),
+            w: 0.0,
             force: vec2(0.0, 0.0),
             mass: PI * r * r,
             moment_of_inertia: PI * r * r * r * r / 2.0,
@@ -58,10 +58,6 @@ impl Circle {
 
     pub fn vel_y(&self) -> f64 {
         return self.v[1];
-    }
-
-    pub fn w(&self) -> f64 {
-        return self.w;
     }
 
     pub fn theta(&self) -> f64 {
@@ -110,49 +106,38 @@ impl Collision for Circle {
     }
 
     fn collide(&mut self, other: &mut Circle, e: f64, dt: f64) {
-        //Conserve energy and momentum look at wikipedia for elastic collisons
-        // let total_mass = self.mass + other.mass;
-        // let mass_ratio_1 = (2.0 * other.mass) / total_mass;
-        // let mass_ratio_2 = (2.0 * self.mass) / total_mass;
-
-        // let v1 = self.v;
-        // let v2 = other.v;
-        // let x1 = self.point;
-        // let x2 = other.point;
-
-        // let dot_1 = dot(&(v1 - v2), &(x1 - x2));
-        // let self_v = e * (self.v - (mass_ratio_1 * (dot_1 / length2(&(x1 - x2))) * (x1 - x2)));
-
-        // let dot_2 = dot(&(v2 - v1), &(x2 - x1));
-        // let other_v = e * (other.v - (mass_ratio_2 * (dot_2 / length2(&(x2 - x1))) * (x2 - x1)));
-
-        // return (self_v, other_v);
-
         // calculate relative velocity
         let rv = other.v - self.v;
-
+        // caculate collison normal
         let normal = (other.point - self.point) / length(&(other.point - self.point));
-
         // calculate rv along normal
         let vel_normal = dot(&rv, &normal);
-
-        // do not resolve if velocities are separating
-        // if vel_normal > 0.0 {
-        //     return (self.v, other.v);
-        // }
-
         // calculate impulse scalar
         let mut j = -(1.0 + e) * vel_normal;
         j = j / (1.0 / self.mass + 1.0 / other.mass);
-
         // apply impulse
         let impulse = j * normal;
-
         // F.dt = J
         // self.add_force(-impulse / dt);
         // other.add_force(impulse / dt);
         self.v = self.v - (1.0 / self.mass * impulse);
         other.v = other.v + (1.0 / other.mass * impulse);
+
+        // angular momentum & impulse
+        // calculate relative velocity
+        let rv_angular = other.w - self.w;
+        // let angular_normal = vec3(normal[0], normal[1], 0.0);
+        // let angular_vel_normal = dot(&rv_angular, &angular_normal);
+        // calculate impulse scalar
+        let mut j_angular = -(1.0 + e) * rv_angular;
+        j_angular = j_angular / (1.0 / self.moment_of_inertia + 1.0 / other.moment_of_inertia);
+        // apply impulse
+        let angular_impulse = j_angular;
+        // F.dt = J
+        // self.add_force(-impulse / dt);
+        // other.add_force(impulse / dt);
+        self.w = self.w - (1.0 / self.moment_of_inertia * angular_impulse);
+        other.w = other.w + (1.0 / self.moment_of_inertia * angular_impulse);
     }
 
     fn apply_impulse(&mut self, impulse: DVec2) {
