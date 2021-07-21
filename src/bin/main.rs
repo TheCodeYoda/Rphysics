@@ -30,6 +30,7 @@ fn get_circle(list: &mut Vec<Circle>, screen: &Screen) -> Option<Circle> {
             rng.gen_range(min_radius, max_radius),
             0.0,
             0.0,
+            40.0,
         );
         let mut flag = 1;
         for sample in list.iter_mut() {
@@ -61,16 +62,16 @@ fn get_circles(engine: &mut Engine, n: u32) {
     // return vec![circ_1, circ_2,circ_3];
 
     // ------------------custom testing ----------------------------
-    // let circ_1 = Circle::new(50.0, 50.0, 50.0, 100.0, 0.0);
-    // let circ_2 = Circle::new(462.0, 50.0, 50.0, -100.0, 0.0);
-    // engine.object_list = vec![circ_1, circ_2];
+    let circ_1 = Circle::new(256.0, 256.0, 50.0, 0.0, 0.0, 40.0);
+    let circ_2 = Circle::new(462.0, 50.0, 50.0, -100.0, 0.0, 0.0);
+    engine.object_list = vec![circ_1];
 
     // --------------------------random testing -------------------------------------
-    for _i in 0..n {
-        if let Some(circ) = get_circle(&mut engine.object_list, &engine.screen) {
-            engine.object_list.push(circ);
-        }
-    }
+    // for _i in 0..n {
+    //     if let Some(circ) = get_circle(&mut engine.object_list, &engine.screen) {
+    //         engine.object_list.push(circ);
+    //     }
+    // }
 }
 
 fn update(engine: &mut Engine, dt: f64) {
@@ -93,7 +94,7 @@ fn main() {
 
     println!("{:?}", (grav_state, n, e));
 
-    let screen = Screen::new(1280.0, 720.0);
+    let screen = Screen::new(512.0, 512.0);
 
     // initializing piston window
     let mut window: PistonWindow =
@@ -125,13 +126,15 @@ fn main() {
                 // background color
                 clear([0.5, 0.5, 0.5, 1.0], g);
                 for circ in &eng.object_list {
-                    ellipse(circ.color(), circ.readjust(), c.transform, g);
+                    let transform = c.transform.trans(50.0, 50.0);
+
+                    ellipse(circ.color(), circ.readjust(), transform, g);
                     line_from_to(
                         [0.0, 0.0, 0.0, 1.0],
                         1.0,
                         [circ.x(), circ.y()],
                         [circ.x() + circ.r(), circ.y()],
-                        c.transform,
+                        transform,
                         g,
                     );
 
