@@ -60,6 +60,15 @@ impl Collision for Screen {
             let impulse = j_mag * normal;
             // println!("{:?}", (other.v, impulse, vel_normal));
             other.v = other.v + (1.0 / other.mass * impulse);
+            // angular momentum & impulse
+            // calculate relative velocity
+            let rv_angular = other.w;
+
+            let mut j_angular = -(1.0 + e) * rv_angular;
+            j_angular = j_angular / (1.0 / other.moment_of_inertia);
+            // apply impulse
+            let angular_impulse = j_angular;
+            other.w = other.w + (1.0 / other.moment_of_inertia * angular_impulse);
         }
 
         if other.point[0] + other.r() > self.width {
