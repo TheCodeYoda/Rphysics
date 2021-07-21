@@ -126,9 +126,7 @@ impl Collision for Circle {
         // angular momentum & impulse
         // calculate relative velocity
         let rv_angular = other.w - self.w;
-        // let angular_normal = vec3(normal[0], normal[1], 0.0);
-        // let angular_vel_normal = dot(&rv_angular, &angular_normal);
-        // calculate impulse scalar
+
         let mut j_angular = -(1.0 + e) * rv_angular;
         j_angular = j_angular / (1.0 / self.moment_of_inertia + 1.0 / other.moment_of_inertia);
         // apply impulse
@@ -137,7 +135,7 @@ impl Collision for Circle {
         // self.add_force(-impulse / dt);
         // other.add_force(impulse / dt);
         self.w = self.w - (1.0 / self.moment_of_inertia * angular_impulse);
-        other.w = other.w + (1.0 / self.moment_of_inertia * angular_impulse);
+        other.w = other.w + (1.0 / other.moment_of_inertia * angular_impulse);
     }
 
     fn apply_impulse(&mut self, impulse: DVec2) {
