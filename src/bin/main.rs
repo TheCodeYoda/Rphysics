@@ -62,7 +62,7 @@ fn get_circles(engine: &mut Engine, n: u32) {
     // return vec![circ_1, circ_2,circ_3];
 
     // ------------------custom testing ----------------------------
-    let circ_1 = Circle::new(256.0, 256.0, 50.0, 0.0, 0.0, 40.0);
+    let circ_1 = Circle::new(256.0, 256.0, 50.0, 60.0, 0.0, 40.0);
     let circ_2 = Circle::new(462.0, 50.0, 50.0, -100.0, 0.0, 0.0);
     engine.object_list = vec![circ_1];
 
@@ -121,12 +121,16 @@ fn main() {
     // render loop
     while let Some(event) = window.next() {
         // this is for rendering
-        if let Some(_) = event.render_args() {
+        if event.render_args().is_some() {
             window.draw_2d(&event, |c, g, _| {
                 // background color
                 clear([0.5, 0.5, 0.5, 1.0], g);
                 for circ in &eng.object_list {
-                    let transform = c.transform.trans(50.0, 50.0);
+                    let transform = c
+                        .transform
+                        .trans(circ.x(), circ.y())
+                        .rot_deg(circ.theta())
+                        .trans(-(circ.x()), -(circ.y()));
 
                     ellipse(circ.color(), circ.readjust(), transform, g);
                     line_from_to(
