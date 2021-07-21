@@ -53,7 +53,7 @@ impl Engine {
     }
 
     pub fn mouse_impulse(&mut self, start_point: DVec2, curr_pos: DVec2) {
-        let mut chosen_circ: Circle = Circle::new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+        let mut chosen_circ: Circle = Circle::new(0.0, 0.0, 0.0);
         let mut flag = 0;
         for circ in &mut self.object_list {
             if circ.point[0] - circ.r() <= start_point[0]
@@ -84,8 +84,10 @@ impl Engine {
             circ.point = circ.point + (circ.v * dt);
 
             //angular motion
+            let radius_vec = vec2(circ.point[0] + circ.r(), circ.point[1]) - circ.point;
+            circ.w = cross2d(&radius_vec, &circ.v);
             circ.theta = (circ.theta + (circ.w * dt)) % 360.0;
-            println!("{} {:?}", circ.theta, circ.point);
+            // println!("{}", circ.w);
 
             // clamping velocities
             if (circ.v[0] * circ.v[0]) + (circ.v[1] * circ.v[1]) <= 0.01 {
