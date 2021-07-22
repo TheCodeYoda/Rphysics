@@ -1,5 +1,5 @@
 use crate::circle::Circle;
-use crate::collison::{Collision, Friction};
+use crate::engine_traits::{Collision, Friction};
 
 extern crate nalgebra_glm as glm;
 use glm::*;

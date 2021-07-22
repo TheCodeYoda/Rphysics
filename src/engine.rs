@@ -1,5 +1,5 @@
 use crate::circle::Circle;
-use crate::collison::*;
+use crate::engine_traits::*;
 use crate::screen::Screen;
 
 extern crate nalgebra_glm as glm;

@@ -1,4 +1,4 @@
-use crate::collison::{distance, Collision, Friction};
+use crate::engine_traits::{distance, Collision, Friction};
 
 extern crate nalgebra_glm as glm;
 use glm::*;

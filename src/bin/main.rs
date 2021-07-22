@@ -6,8 +6,8 @@ extern crate nalgebra_glm as glm;
 use glm::*;
 
 use rphysics::circle::*;
-use rphysics::collison::*;
 use rphysics::engine::*;
+use rphysics::engine_traits::*;
 use rphysics::screen::*;
 
 /// randomly spawns Non overlapping circles in the Screen
