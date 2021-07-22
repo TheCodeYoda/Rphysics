@@ -96,5 +96,5 @@ impl Collision for Screen {
         }
     }
 
-    fn apply_impulse(&mut self, _impulse: DVec2) {}
+    fn apply_impulse(&mut self, _impulse: DVec2, _poa: DVec2) {}
 }
