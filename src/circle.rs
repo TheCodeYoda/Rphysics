@@ -138,7 +138,15 @@ impl Collision for Circle {
         other.w = other.w + (1.0 / other.moment_of_inertia * angular_impulse);
     }
 
-    fn apply_impulse(&mut self, impulse: DVec2) {
+    fn apply_impulse(&mut self, impulse: DVec2, poa: DVec2) {
         self.v = self.v - (1.0 / self.mass * impulse);
+        let r_vec = poa - self.point;
+        let dir = cross2d(&r_vec, &self.v);
+        let w_scalar = length(&self.v) / length(&r_vec);
+        if dir < 0.0 {
+            self.w += 10.0 * -w_scalar;
+        } else {
+            self.w += 10.0 * w_scalar;
+        }
     }
 }
