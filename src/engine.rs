@@ -85,8 +85,11 @@ impl Engine {
             // println!("vel: {}", length2(&circ.v));
 
             //angular motion
+            let net_torque = circ.torque;
+            let angular_acc = net_torque / circ.moment_of_inertia;
+            circ.w = circ.w + angular_acc * dt;
             circ.theta = (circ.theta + (circ.w * dt)) % 360.0;
-            // println!("{}", circ.w);
+            // println!("{} {}", net_torque, circ.w);
 
             // clamping velocities
             if (circ.v[0] * circ.v[0]) + (circ.v[1] * circ.v[1]) <= 0.01 {
@@ -96,8 +99,9 @@ impl Engine {
                 circ.w = 0.0;
             }
 
-            //resetting force
+            //resetting force & torque
             circ.force = vec2(0.0, 0.0);
+            circ.torque = 0.0;
         }
     }
 
