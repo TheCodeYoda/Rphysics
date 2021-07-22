@@ -82,7 +82,7 @@ impl Engine {
             let acc = net_force / circ.mass;
             circ.v = circ.v + (acc * dt);
             circ.point = circ.point + (circ.v * dt);
-            // println!("vel: {}", length2(&circ.v));
+            // println!("vel: {} acc: {}", length2(&circ.v), length2(&acc));
 
             //angular motion
             let net_torque = circ.torque;
@@ -92,10 +92,10 @@ impl Engine {
             // println!("{} {}", net_torque, circ.w);
 
             // clamping velocities
-            if (circ.v[0] * circ.v[0]) + (circ.v[1] * circ.v[1]) <= 0.01 {
+            if (circ.v[0] * circ.v[0]) + (circ.v[1] * circ.v[1]) <= 0.42 {
                 circ.v = vec2(0.0, 0.0);
             }
-            if circ.w * circ.w <= 0.01 {
+            if circ.w * circ.w <= 0.42 {
                 circ.w = 0.0;
             }
 
