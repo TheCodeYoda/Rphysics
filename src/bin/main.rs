@@ -91,7 +91,7 @@ fn main() {
 
     println!("{:?}", (grav_state, n, e));
 
-    let screen = Screen::new(512.0, 512.0);
+    let screen = Screen::new(1280.0, 720.0);
 
     // initializing piston window
     let mut window: PistonWindow =
