@@ -1,5 +1,5 @@
 use crate::circle::Circle;
-use crate::collison::Collision;
+use crate::collison::{Collision, Friction};
 
 extern crate nalgebra_glm as glm;
 use glm::*;
@@ -7,6 +7,7 @@ use glm::*;
 pub struct Screen {
     width: f64,
     height: f64,
+    dynamic_friction: f64,
 }
 
 impl Screen {
@@ -14,6 +15,7 @@ impl Screen {
         return Screen {
             width: width,
             height: height,
+            dynamic_friction: 0.2,
         };
     }
 
@@ -49,7 +51,7 @@ impl Collision for Screen {
         return false;
     }
 
-    fn collide(&mut self, other: &mut Circle, e: f64, dt: f64) {
+    fn collide(&mut self, other: &mut Circle, e: f64, _dt: f64) {
         fn apply_impulse(other: &mut Circle, poc: DVec2, e: f64) {
             let rv = other.v;
             let normal = (other.point - poc) / length(&(other.point - poc));
@@ -81,6 +83,7 @@ impl Collision for Screen {
             let poc = vec2(other.point[0], other.point[1] + other.r());
             other.point = vec2(other.point[0], self.height - other.r());
             apply_impulse(other, poc, e);
+            other.add_friction_impulse(self.dynamic_friction, vec2(0.0, 100.0));
         }
         // hits left side wall
         if other.point[0] - other.r() < 0.0 {
