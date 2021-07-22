@@ -82,6 +82,7 @@ impl Engine {
             let acc = net_force / circ.mass;
             circ.v = circ.v + (acc * dt);
             circ.point = circ.point + (circ.v * dt);
+            // println!("vel: {}", length2(&circ.v));
 
             //angular motion
             circ.theta = (circ.theta + (circ.w * dt)) % 360.0;
@@ -94,6 +95,9 @@ impl Engine {
             if circ.w * circ.w <= 0.01 {
                 circ.w = 0.0;
             }
+
+            //resetting force
+            circ.force = vec2(0.0, 0.0);
         }
     }
 
