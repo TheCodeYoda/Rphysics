@@ -70,7 +70,7 @@ impl Engine {
             let impulse = curr_pos - start_point;
             self.object_list.retain(|x| x.point != chosen_circ.point);
             chosen_circ.v = vec2(0.0, 0.0);
-            chosen_circ.apply_impulse(impulse * 5000.0);
+            chosen_circ.apply_impulse(impulse * 5000.0, start_point);
             self.add(chosen_circ);
         }
     }
@@ -84,15 +84,8 @@ impl Engine {
             circ.point = circ.point + (circ.v * dt);
 
             //angular motion
-            let radius_vec = vec2(circ.point[0] + circ.r(), circ.point[1]) - circ.point;
-            let dir = cross2d(&radius_vec, &circ.v);
-            circ.w = if dir < 0.0 {
-                -length(&circ.v) / circ.r()
-            } else {
-                length(&circ.v) / circ.r()
-            };
             circ.theta = (circ.theta + (circ.w * dt)) % 360.0;
-            println!("{}", circ.w);
+            // println!("{}", circ.w);
 
             // clamping velocities
             if (circ.v[0] * circ.v[0]) + (circ.v[1] * circ.v[1]) <= 0.01 {
