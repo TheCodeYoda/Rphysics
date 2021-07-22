@@ -13,6 +13,7 @@ pub struct Circle {
     pub v: DVec2,
     pub w: f64,
     pub force: DVec2,
+    pub torque: f64,
     pub mass: f64,
     pub moment_of_inertia: f64,
     color: [f32; 4],
@@ -35,6 +36,7 @@ impl Circle {
             v: vec2(0.0, 0.0),
             w: 0.0,
             force: vec2(0.0, 0.0),
+            torque: 0.0,
             mass: PI * r * r,
             moment_of_inertia: PI * r * r * r * r / 2.0,
             color: color,
@@ -86,6 +88,11 @@ impl Circle {
     /// adds force
     pub fn add_force(&mut self, force: DVec2) {
         self.force += force;
+    }
+
+    /// adds torque
+    pub fn add_torque(&mut self, torque: f64) {
+        self.torque += torque;
     }
 }
 
@@ -164,9 +171,14 @@ impl Friction for Circle {
                 }
                 return -1.0;
             };
+            // friction_force
             let dir_vec = vec2(vel_x(self.v[0]), 0.0);
             let force_friction = dynamic_friction * normal_reaction * dir_vec;
             self.add_force(force_friction);
+            // friction_torque
+            let r_vec = vec2(self.point[0], self.point[1] + self.r) - self.point;
+            let torque_friction = cross2d(&r_vec, &force_friction);
+            self.add_torque(torque_friction * 10000.0);
         }
     }
 }
