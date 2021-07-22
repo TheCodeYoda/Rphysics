@@ -73,16 +73,19 @@ impl Collision for Screen {
             other.w = other.w + (1.0 / other.moment_of_inertia * angular_impulse);
         }
 
+        // hits right side wall
         if other.point[0] + other.r() > self.width {
             let poc = vec2(other.point[0] + other.r(), other.point[1]);
             other.point = vec2(self.width - other.r(), other.point[1]);
             apply_impulse(other, poc, e);
+            other.add_friction_impulse(self.dynamic_friction, vec2(0.0, 100.0));
         }
         // hits lower wall
         if other.point[1] + other.r() > self.height {
             let poc = vec2(other.point[0], other.point[1] + other.r());
             other.point = vec2(other.point[0], self.height - other.r());
             apply_impulse(other, poc, e);
+            other.add_force(-other.mass * vec2(0.0, 100.0));
             other.add_friction_impulse(self.dynamic_friction, vec2(0.0, 100.0));
         }
         // hits left side wall
@@ -90,12 +93,14 @@ impl Collision for Screen {
             let poc = vec2(0.0, other.point[1]);
             other.point = vec2(other.r(), other.point[1]);
             apply_impulse(other, poc, e);
+            other.add_friction_impulse(self.dynamic_friction, vec2(0.0, 100.0));
         }
         // hits upper wall
         if other.point[1] - other.r() < 0.0 {
             let poc = vec2(other.point[0], 0.0);
             other.point = vec2(other.point[0], other.r());
             apply_impulse(other, poc, e);
+            other.add_friction_impulse(self.dynamic_friction, vec2(0.0, 100.0));
         }
     }
 
