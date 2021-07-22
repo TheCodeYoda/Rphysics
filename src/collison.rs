@@ -9,9 +9,14 @@ pub fn distance(x1: f64, y1: f64, x2: f64, y2: f64) -> f64 {
     return sq.sqrt();
 }
 
-// a trait for checking bounds of screen and readjusting the position of the shape accordingly
+// a trait for collison
 pub trait Collision {
     fn is_colliding(&mut self, other: &mut Circle) -> bool;
     fn collide(&mut self, other: &mut Circle, e: f64, dt: f64);
     fn apply_impulse(&mut self, impulse: DVec2, poa: DVec2);
+}
+
+// a trait for friction
+pub trait Friction {
+    fn add_friction_impulse(&mut self, dynamic_friction: f64, g: DVec2);
 }
