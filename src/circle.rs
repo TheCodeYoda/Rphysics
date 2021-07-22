@@ -1,4 +1,4 @@
-use crate::collison::{distance, Collision};
+use crate::collison::{distance, Collision, Friction};
 
 extern crate nalgebra_glm as glm;
 use glm::*;
@@ -105,7 +105,7 @@ impl Collision for Circle {
         return false;
     }
 
-    fn collide(&mut self, other: &mut Circle, e: f64, dt: f64) {
+    fn collide(&mut self, other: &mut Circle, e: f64, _dt: f64) {
         // calculate relative velocity
         let rv = other.v - self.v;
         // caculate collison normal
@@ -147,6 +147,26 @@ impl Collision for Circle {
             self.w += 10.0 * -w_scalar;
         } else {
             self.w += 10.0 * w_scalar;
+        }
+    }
+}
+
+impl Friction for Circle {
+    fn add_friction_impulse(&mut self, dynamic_friction: f64, g: DVec2) {
+        // if body is moving
+        if length2(&self.v) > 0.0 {
+            let normal_reaction = self.mass * length(&g);
+            let vel_x = |x_vel: f64| -> f64 {
+                if x_vel == 0.0 {
+                    return 0.0;
+                } else if x_vel < 0.0 {
+                    return 1.0;
+                }
+                return -1.0;
+            };
+            let dir_vec = vec2(vel_x(self.v[0]), 0.0);
+            let force_friction = dynamic_friction * normal_reaction * dir_vec;
+            self.add_force(force_friction);
         }
     }
 }
