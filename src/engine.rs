@@ -2,6 +2,7 @@ use crate::circle::Circle;
 use crate::engine_traits::*;
 use crate::screen::Screen;
 
+use rand::*;
 extern crate nalgebra_glm as glm;
 use glm::*;
 
@@ -50,6 +51,67 @@ impl Engine {
 
     pub fn add(&mut self, circ: Circle) {
         self.object_list.push(circ);
+    }
+
+    /// randomly spawns Non overlapping circles in the Screen
+    pub fn get_circle(&mut self) -> Option<Circle> {
+        let mut tries = 100000;
+        while tries > 0 {
+            // rand handle
+            let mut rng = rand::thread_rng();
+
+            let _min_vel = 600.0;
+            let _max_vel = 700.0;
+            let min_radius = 25.0;
+            let max_radius = 30.0;
+            let width = self.screen.width();
+            let height = self.screen.height();
+
+            let mut circ = Circle::new(
+                rng.gen_range(max_radius, width - max_radius),
+                rng.gen_range(max_radius, height - max_radius),
+                rng.gen_range(min_radius, max_radius),
+            );
+            let mut flag = 1;
+            for sample in self.object_list.iter_mut() {
+                if circ.is_colliding(sample) {
+                    flag = 0;
+                    break;
+                }
+            }
+
+            if flag == 1 {
+                return Some(circ);
+            }
+
+            tries -= 1;
+        }
+        None
+    }
+
+    pub fn get_circles(&mut self, n: u32) {
+        // let w = 512.0;
+        // let h = 512.0;
+        // let v = 100.0;
+        // let circ_1 = Circle::new(256.0, 0.0, 50.0, 0.0, v);
+        // let x = w/2.0 -((w/2.0)*(PI/3.0).sin());
+        // let y = ((w/2.0*(PI/3.0).cos())) + h/2.0;
+        // let circ_2 = Circle::new(x, y, 50.0,v*(PI/6.0).cos(), -v*(PI/6.0).sin());
+        // let x = w/2.0 +((w/2.0)*(PI/3.0).sin());
+        // let circ_3 = Circle::new(x, y, 50.0, -v*(PI/6.0).cos(), -v*(PI/6.0).sin());
+        // return vec![circ_1, circ_2,circ_3];
+
+        // ------------------custom testing ----------------------------
+        // let circ_1 = Circle::new(256.0, 256.0, 50.0, 60.0, 0.0, 40.0);
+        // let _circ_2 = Circle::new(462.0, 50.0, 50.0, -100.0, 0.0, 0.0);
+        // engine.object_list = vec![circ_1];
+
+        // --------------------------random testing -------------------------------------
+        for _i in 0..n {
+            if let Some(circ) = self.get_circle() {
+                self.object_list.push(circ);
+            }
+        }
     }
 
     pub fn mouse_impulse(&mut self, start_point: DVec2, curr_pos: DVec2) {

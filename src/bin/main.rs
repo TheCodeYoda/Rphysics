@@ -1,75 +1,12 @@
 use piston_window::*;
 // use std::f64::consts::PI;
-use rand::*;
 use std::env;
 extern crate nalgebra_glm as glm;
 use glm::*;
 
 use rphysics::circle::*;
 use rphysics::engine::*;
-use rphysics::engine_traits::*;
 use rphysics::screen::*;
-
-/// randomly spawns Non overlapping circles in the Screen
-fn get_circle(list: &mut Vec<Circle>, screen: &Screen) -> Option<Circle> {
-    let mut tries = 100000;
-    while tries > 0 {
-        // rand handle
-        let mut rng = rand::thread_rng();
-
-        let _min_vel = 600.0;
-        let _max_vel = 700.0;
-        let min_radius = 25.0;
-        let max_radius = 30.0;
-        let width = screen.width();
-        let height = screen.height();
-
-        let mut circ = Circle::new(
-            rng.gen_range(max_radius, width - max_radius),
-            rng.gen_range(max_radius, height - max_radius),
-            rng.gen_range(min_radius, max_radius),
-        );
-        let mut flag = 1;
-        for sample in list.iter_mut() {
-            if circ.is_colliding(sample) {
-                flag = 0;
-                break;
-            }
-        }
-
-        if flag == 1 {
-            return Some(circ);
-        }
-
-        tries -= 1;
-    }
-    return None;
-}
-
-fn get_circles(engine: &mut Engine, n: u32) {
-    // let w = 512.0;
-    // let h = 512.0;
-    // let v = 100.0;
-    // let circ_1 = Circle::new(256.0, 0.0, 50.0, 0.0, v);
-    // let x = w/2.0 -((w/2.0)*(PI/3.0).sin());
-    // let y = ((w/2.0*(PI/3.0).cos())) + h/2.0;
-    // let circ_2 = Circle::new(x, y, 50.0,v*(PI/6.0).cos(), -v*(PI/6.0).sin());
-    // let x = w/2.0 +((w/2.0)*(PI/3.0).sin());
-    // let circ_3 = Circle::new(x, y, 50.0, -v*(PI/6.0).cos(), -v*(PI/6.0).sin());
-    // return vec![circ_1, circ_2,circ_3];
-
-    // ------------------custom testing ----------------------------
-    // let circ_1 = Circle::new(256.0, 256.0, 50.0, 60.0, 0.0, 40.0);
-    // let _circ_2 = Circle::new(462.0, 50.0, 50.0, -100.0, 0.0, 0.0);
-    // engine.object_list = vec![circ_1];
-
-    // --------------------------random testing -------------------------------------
-    for _i in 0..n {
-        if let Some(circ) = get_circle(&mut engine.object_list, &engine.screen) {
-            engine.object_list.push(circ);
-        }
-    }
-}
 
 fn update(engine: &mut Engine, dt: f64) {
     engine.resolve_collisons(dt);
@@ -103,7 +40,7 @@ fn main() {
     let mut eng = Engine::new(e, screen);
 
     // get object list
-    get_circles(&mut eng, n);
+    eng.get_circles(n);
 
     if grav_state == "on" {
         eng.gravity_on();
