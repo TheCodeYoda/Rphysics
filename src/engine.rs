@@ -140,16 +140,17 @@ impl Engine {
     pub fn update_pos(&mut self, dt: f64) {
         for circ in &mut self.object_list {
             // linear motion
-            let net_force = circ.force + circ.mass * self.g;
+            circ.add_force(circ.mass * self.g);
+            let net_force = circ.force;
             let acc = net_force / circ.mass;
-            circ.v = circ.v + (acc * dt);
-            circ.point = circ.point + (circ.v * dt);
+            circ.v += acc * dt;
+            circ.point += circ.v * dt;
             // println!("vel: {} acc: {}", length2(&circ.v), length2(&acc));
 
             //angular motion
             let net_torque = circ.torque;
             let angular_acc = net_torque / circ.moment_of_inertia;
-            circ.w = circ.w + angular_acc * dt;
+            circ.w += angular_acc * dt;
             circ.theta = (circ.theta + (circ.w * dt)) % 360.0;
             // println!("{} {}", net_torque, circ.w);
 

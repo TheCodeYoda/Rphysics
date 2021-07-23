@@ -1,5 +1,4 @@
 use piston_window::*;
-// use std::f64::consts::PI;
 use std::env;
 extern crate nalgebra_glm as glm;
 use glm::*;
