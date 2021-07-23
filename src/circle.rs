@@ -16,6 +16,7 @@ pub struct Circle {
     pub torque: f64,
     pub mass: f64,
     pub moment_of_inertia: f64,
+    rolling_friction_coeff: f64,
     color: [f32; 4],
 }
 
@@ -39,6 +40,7 @@ impl Circle {
             torque: 0.0,
             mass: PI * r * r,
             moment_of_inertia: PI * r * r * r * r / 2.0,
+            rolling_friction_coeff: 0.2,
             color: color,
         };
     }
@@ -109,7 +111,7 @@ impl Collision for Circle {
 
             return true;
         }
-        return false;
+        false
     }
 
     fn collide(&mut self, other: &mut Circle, e: f64, _dt: f64) {
@@ -121,26 +123,19 @@ impl Collision for Circle {
         let vel_normal = dot(&rv, &normal);
         // calculate impulse scalar
         let mut j = -(1.0 + e) * vel_normal;
-        j = j / (1.0 / self.mass + 1.0 / other.mass);
+        j /= 1.0 / self.mass + 1.0 / other.mass;
         // apply impulse
         let impulse = j * normal;
-        self.v = self.v - (1.0 / self.mass * impulse);
-        other.v = other.v + (1.0 / other.mass * impulse);
+        self.v -= 1.0 / self.mass * impulse;
+        other.v += 1.0 / other.mass * impulse;
 
-        // angular momentum & impulse
-        // calculate relative velocity
-        let rv_angular = other.w - self.w;
-
-        let mut j_angular = -(1.0 + e) * rv_angular;
-        j_angular = j_angular / (1.0 / self.moment_of_inertia + 1.0 / other.moment_of_inertia);
-        // apply impulse
-        let angular_impulse = j_angular;
-        self.w = self.w - (1.0 / self.moment_of_inertia * angular_impulse);
-        other.w = other.w + (1.0 / other.moment_of_inertia * angular_impulse);
+        // adjusting angular velocities according to the formula v = rw
+        self.w -= length(&(1.0 / self.mass * impulse)) / self.r;
+        other.w += length(&(1.0 / other.mass * impulse)) / other.r;
     }
 
     fn apply_impulse(&mut self, impulse: DVec2, poa: DVec2) {
-        self.v = self.v - (1.0 / self.mass * impulse);
+        self.v -= 1.0 / self.mass * impulse;
         let r_vec = poa - self.point;
         let dir = cross2d(&r_vec, &self.v);
         let w_scalar = length(&self.v) / length(&r_vec);
@@ -163,7 +158,7 @@ impl Friction for Circle {
                 } else if x_vel < 0.0 {
                     return 1.0;
                 }
-                return -1.0;
+                -1.0
             };
             // friction_force
             let dir_vec = vec2(vel_x(self.v[0]), 0.0);
@@ -174,5 +169,19 @@ impl Friction for Circle {
             let torque_friction = cross2d(&r_vec, &force_friction);
             self.add_torque(torque_friction * 10000.0);
         }
+    }
+
+    fn add_rolling_friction_impulse(&mut self, _other: &mut Circle, g: DVec2) {
+        // let dir = |w|-> f64 {
+        //     if w>0.0 {
+        //         1.0
+        //     }
+        //     else if w<0.0 {
+        //         -1.0
+        //     }
+        //     0.0;
+        // };
+
+        // let dir_vec = vec2(dir(self.w))
     }
 }

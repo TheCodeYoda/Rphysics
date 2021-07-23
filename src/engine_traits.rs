@@ -6,7 +6,7 @@ extern crate nalgebra_glm as glm;
 /// finds euclidian distance between 2 points
 pub fn distance(x1: f64, y1: f64, x2: f64, y2: f64) -> f64 {
     let sq = ((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1));
-    return sq.sqrt();
+    sq.sqrt()
 }
 
 // a trait for collison
@@ -19,4 +19,5 @@ pub trait Collision {
 // a trait for friction
 pub trait Friction {
     fn add_friction_impulse(&mut self, dynamic_friction: f64, g: DVec2);
+    fn add_rolling_friction_impulse(&mut self, other: &mut Circle, g: DVec2);
 }
