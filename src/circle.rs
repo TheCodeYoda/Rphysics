@@ -124,9 +124,6 @@ impl Collision for Circle {
         j = j / (1.0 / self.mass + 1.0 / other.mass);
         // apply impulse
         let impulse = j * normal;
-        // F.dt = J
-        // self.add_force(-impulse / dt);
-        // other.add_force(impulse / dt);
         self.v = self.v - (1.0 / self.mass * impulse);
         other.v = other.v + (1.0 / other.mass * impulse);
 
@@ -138,9 +135,6 @@ impl Collision for Circle {
         j_angular = j_angular / (1.0 / self.moment_of_inertia + 1.0 / other.moment_of_inertia);
         // apply impulse
         let angular_impulse = j_angular;
-        // F.dt = J
-        // self.add_force(-impulse / dt);
-        // other.add_force(impulse / dt);
         self.w = self.w - (1.0 / self.moment_of_inertia * angular_impulse);
         other.w = other.w + (1.0 / other.moment_of_inertia * angular_impulse);
     }
