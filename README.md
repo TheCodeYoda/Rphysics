@@ -1,11 +1,15 @@
 # Rphysics
-A simple Physics simulation written completely in Rust which supports
-* Elastic and Inelastic collisons
-* gravity
+A simple two-dimensional Physics Engine written completely in Rust which supports
+* Elastic and Inelastic collisons.
+* Mouse impulse support.
+* Linear and rotational mechanics.
+* gravity and friction simulation.
+
 
 ## Usage
 
-> **_NOTE:_**  0.0 <= Coeffecient of restitiution <= 1.0 , rust version 1.47.0 required 
+> 0.0 <= Coeffecient of restitiution <= 1.0 , rust version 1.47.0 required 
+> Switch to dev branch for latest code
 
 1. Clone the repo
 2. cd Rphysics/
