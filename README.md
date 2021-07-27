@@ -24,5 +24,7 @@ Example
 
 ### Elastic collisons
 ![Elastic Collisons](/gifs/collision.gif)
+### Mouse Impulse
+![Mouse Impulse](/gifs/mouse_impulse.gif)
 ### Gravity
 ![Gravity](/gifs/gravity.gif)
