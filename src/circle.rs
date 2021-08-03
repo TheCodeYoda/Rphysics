@@ -7,6 +7,7 @@ use std::f64::consts::PI;
 
 #[derive(Copy, Clone, Debug)]
 pub struct Circle {
+    pub id: u32,
     pub point: DVec2,
     pub theta: f64,
     r: f64,
@@ -21,7 +22,7 @@ pub struct Circle {
 }
 
 impl Circle {
-    pub fn new(x: f64, y: f64, r: f64) -> Circle {
+    pub fn new(x: f64, y: f64, r: f64, id: u32) -> Circle {
         let mut rng = rand::thread_rng();
         let color = [
             rng.gen_range(0.0, 1.0),
@@ -31,6 +32,7 @@ impl Circle {
         ];
 
         return Circle {
+            id: id,
             point: vec2(x, y),
             theta: 0.0,
             r: r,
@@ -45,31 +47,31 @@ impl Circle {
         };
     }
     pub fn x(&self) -> f64 {
-        return self.point[0];
+        self.point[0]
     }
 
     pub fn y(&self) -> f64 {
-        return self.point[1];
+        self.point[1]
     }
 
     pub fn r(&self) -> f64 {
-        return self.r;
+        self.r
     }
 
     pub fn vel_x(&self) -> f64 {
-        return self.v[0];
+        self.v[0]
     }
 
     pub fn vel_y(&self) -> f64 {
-        return self.v[1];
+        self.v[1]
     }
 
     pub fn theta(&self) -> f64 {
-        return self.theta;
+        self.theta
     }
 
     pub fn color(&self) -> [f32; 4] {
-        return self.color;
+        self.color
     }
 
     /// helper to display coords
