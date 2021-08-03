@@ -8,7 +8,8 @@ use rphysics::engine::*;
 use rphysics::screen::*;
 
 fn update(engine: &mut Engine, dt: f64) {
-    engine.resolve_collisons(dt);
+    // engine.resolve_collisons(dt);
+    engine.sweep_and_prune(dt);
     engine.resolve_wall_collisions(dt);
     engine.update_pos(dt);
 }
