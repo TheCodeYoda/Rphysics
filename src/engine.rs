@@ -54,7 +54,7 @@ impl Engine {
     }
 
     /// randomly spawns Non overlapping circles in the Screen
-    pub fn get_circle(&mut self) -> Option<Circle> {
+    pub fn get_circle(&mut self, id: u32) -> Option<Circle> {
         let mut tries = 100000;
         while tries > 0 {
             // rand handle
@@ -71,6 +71,7 @@ impl Engine {
                 rng.gen_range(max_radius, width - max_radius),
                 rng.gen_range(max_radius, height - max_radius),
                 rng.gen_range(min_radius, max_radius),
+                id,
             );
             let mut flag = 1;
             for sample in self.object_list.iter_mut() {
@@ -90,32 +91,23 @@ impl Engine {
     }
 
     pub fn get_circles(&mut self, n: u32) {
-        // let w = 512.0;
-        // let h = 512.0;
-        // let v = 100.0;
-        // let circ_1 = Circle::new(256.0, 0.0, 50.0, 0.0, v);
-        // let x = w/2.0 -((w/2.0)*(PI/3.0).sin());
-        // let y = ((w/2.0*(PI/3.0).cos())) + h/2.0;
-        // let circ_2 = Circle::new(x, y, 50.0,v*(PI/6.0).cos(), -v*(PI/6.0).sin());
-        // let x = w/2.0 +((w/2.0)*(PI/3.0).sin());
-        // let circ_3 = Circle::new(x, y, 50.0, -v*(PI/6.0).cos(), -v*(PI/6.0).sin());
-        // return vec![circ_1, circ_2,circ_3];
-
         // ------------------custom testing ----------------------------
         // let circ_1 = Circle::new(256.0, 256.0, 50.0, 60.0, 0.0, 40.0);
         // let _circ_2 = Circle::new(462.0, 50.0, 50.0, -100.0, 0.0, 0.0);
         // engine.object_list = vec![circ_1];
 
         // --------------------------random testing -------------------------------------
+        let mut id = 1;
         for _i in 0..n {
-            if let Some(circ) = self.get_circle() {
+            if let Some(circ) = self.get_circle(id) {
                 self.object_list.push(circ);
+                id += 1;
             }
         }
     }
 
     pub fn mouse_impulse(&mut self, start_point: DVec2, curr_pos: DVec2) {
-        let mut chosen_circ: Circle = Circle::new(0.0, 0.0, 0.0);
+        let mut chosen_circ: Circle = Circle::new(0.0, 0.0, 0.0, 0);
         let mut flag = 0;
         for circ in &mut self.object_list {
             if circ.point[0] - circ.r() <= start_point[0]
@@ -178,15 +170,48 @@ impl Engine {
     // implementing sweep and prune algo
     pub fn resolve_collisons(&mut self, dt: f64) {
         let n = self.object_list.len();
-        // sort according to x axis
-        // self.object_list
-        //     .sort_by(|a, b| (a.x() - a.r()).partial_cmp(&(b.x() - b.r())).unwrap());
-        // active list contains circles which are overlapping in specified axis
         (0..n).for_each(|i| {
             (i + 1..n).for_each(|j| {
                 let (left, right) = self.object_list.split_at_mut(j);
                 resolve_active_collisons(&mut left[i], &mut right[0], self.e, dt);
             });
         });
+    }
+
+    // sort according to x axis
+    pub fn sort_object_list(&mut self) {
+        self.object_list
+            .sort_by(|a, b| (a.x() - a.r()).partial_cmp(&(b.x() - b.r())).unwrap());
+    }
+
+    pub fn sweep_and_prune(&mut self, dt: f64) {
+        // let n = self.object_list.len();
+        self.sort_object_list();
+
+        let mut active_list: Vec<&mut Circle> = Vec::new();
+
+        // let axis_list = self.object_list.clone();
+
+        for i in self.object_list.iter_mut() {
+            let mut temp: Vec<Circle> = Vec::new();
+            //println!("{:?} {:?}", n1, active_list);
+            for j in active_list.iter_mut() {
+                if i.x() - i.r() > j.x() + j.r() {
+                    temp.push(**j);
+                } else {
+                    //println!("{:?},{:?}", i.id, j.id);
+                    resolve_active_collisons(i, j, self.e, dt);
+                }
+            }
+            active_list.retain(|x| {
+                for circ in temp.iter() {
+                    if circ.id == x.id {
+                        return false;
+                    }
+                }
+                true
+            });
+            active_list.push(i);
+        }
     }
 }
